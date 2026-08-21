@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bigette Fotos e Vídeos — Ensaios, Eventos e Vídeo</title>
+<style>
+  :root{
+    --bg:#100E0C; --bg2:#171412; --cream:#F6F1E9; --muted:#B4A99B;
+    --accent:#C97B4A; --accent2:#E3A46F; --wpp:#25D366; --line:rgba(246,241,233,.12);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--cream);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .serif{font-family:Georgia,"Times New Roman",serif;font-weight:400}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+  section{padding:86px 0;position:relative}
+  .eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent2);
+    font-weight:700;margin-bottom:18px}
+  h1{font-size:clamp(38px,7.5vw,68px);line-height:1.04;letter-spacing:-.02em}
+  h2{font-size:clamp(28px,4.6vw,44px);line-height:1.12;letter-spacing:-.015em;margin-bottom:20px}
+  h3{font-size:20px;line-height:1.3;margin-bottom:10px}
+  p{color:var(--muted);font-size:17px}
+  .lead{font-size:clamp(17px,2.1vw,21px);color:#D9CFC2;max-width:56ch}
+
+  /* ---------- BARRA FIXA ---------- */
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:90;background:rgba(16,14,12,.82);
+    backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .logo{font-family:Georgia,serif;font-size:19px;letter-spacing:.02em}
+  .logo span{color:var(--accent2)}
+  .btn{display:inline-flex;align-items:center;gap:9px;background:var(--accent);color:#1A1108;
+    border:none;border-radius:100px;padding:13px 24px;font-size:15px;font-weight:700;
+    text-decoration:none;cursor:pointer;transition:.2s;letter-spacing:.01em}
+  .btn:hover{background:var(--accent2);transform:translateY(-2px)}
+  .btn-sm{padding:9px 18px;font-size:13.5px}
+  .btn-wpp{background:var(--wpp);color:#06301A}
+  .btn-wpp:hover{background:#3DE87B}
+  .btn-lg{padding:19px 38px;font-size:18px}
+
+  /* ---------- HERO ---------- */
+  .hero{min-height:100svh;display:flex;align-items:flex-end;padding:0 0 64px;
+    background:linear-gradient(180deg,rgba(16,14,12,.42) 0%,rgba(16,14,12,.55) 45%,var(--bg) 100%),
+    repeating-linear-gradient(115deg,#2A231D 0 42px,#332A22 42px 84px)}
+  .hero-note{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    color:rgba(246,241,233,.24);font-size:12px;letter-spacing:.3em;text-transform:uppercase;
+    text-align:center;pointer-events:none}
+  .hero h1{max-width:15ch}
+  .hero .lead{margin:22px 0 30px}
+
+  /* ---------- GATILHO (repetido) ---------- */
+  .gatilho{margin-top:38px;padding:26px 28px;border-radius:18px;
+    background:linear-gradient(135deg,rgba(201,123,74,.14),rgba(201,123,74,.05));
+    border:1px solid rgba(201,123,74,.3);
+    display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px}
+  .gatilho p{color:#EFE6DA;font-size:18px;font-family:Georgia,serif;font-style:italic;
+    max-width:46ch;line-height:1.4}
+  .gatilho .btn{flex-shrink:0}
+
+  /* ---------- FAIXA ---------- */
+  .faixa{background:var(--accent);color:#1A1108;padding:56px 0;text-align:center}
+  .faixa p{color:#1A1108;font-family:Georgia,serif;font-size:clamp(22px,3.6vw,34px);
+    line-height:1.25;max-width:22ch;margin:0 auto;font-weight:400}
+
+  /* ---------- CARDS ---------- */
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:20px;margin-top:44px}
+  .card{background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:32px 26px}
+  .card .num{font-family:Georgia,serif;font-size:34px;color:var(--accent);
+    line-height:1;margin-bottom:16px;display:block}
+  .card p{font-size:15.5px}
+
+  /* ---------- PORTFOLIO ---------- */
+  .folio{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:40px}
+  .ph{aspect-ratio:3/4;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    color:rgba(246,241,233,.3);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    text-align:center;padding:12px;border:1px dashed rgba(246,241,233,.16)}
+  .ph:nth-child(odd){background:repeating-linear-gradient(45deg,#241E19 0 26px,#2C251E 26px 52px)}
+  .ph:nth-child(even){background:repeating-linear-gradient(45deg,#2C251E 0 26px,#241E19 26px 52px)}
+  .ph.wide{aspect-ratio:16/10;grid-column:span 2}
+
+  /* ---------- DEPOIMENTOS ---------- */
+  .depos{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:40px}
+  .depo{background:var(--bg2);border-radius:18px;padding:30px 26px;border:1px solid var(--line)}
+  .depo q{font-family:Georgia,serif;font-size:22px;line-height:1.3;color:var(--cream);
+    display:block;margin-bottom:14px;font-style:italic}
+  .depo span{font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent2)}
+
+  /* ---------- PASSOS ---------- */
+  .passos{margin-top:44px;border-top:1px solid var(--line)}
+  .passo{display:flex;gap:24px;padding:26px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+  .passo b{font-family:Georgia,serif;font-size:28px;color:var(--accent);
+    min-width:44px;line-height:1}
+  .passo h3{margin-bottom:5px}
+  .passo p{font-size:15.5px}
+
+  /* ---------- SOBRE / VIDEO ---------- */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center}
+  .alt{background:var(--bg2)}
+
+  /* ---------- FAQ ---------- */
+  .faq{margin-top:40px;border-top:1px solid var(--line)}
+  details{border-bottom:1px solid var(--line)}
+  summary{padding:22px 0;cursor:pointer;font-size:18px;font-weight:600;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;gap:16px}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--accent);font-size:26px;font-weight:300;flex-shrink:0}
+  details[open] summary::after{content:"−"}
+  details p{padding-bottom:22px;font-size:16px;max-width:62ch}
+
+  /* ---------- FINAL ---------- */
+  .final{text-align:center;background:
+    radial-gradient(ellipse at 50% 0%,rgba(201,123,74,.2),transparent 62%),var(--bg2)}
+  .final h2{max-width:17ch;margin:0 auto 22px}
+  .final .lead{margin:0 auto 34px}
+  .selo{font-size:13px;color:var(--muted);margin-top:22px}
+
+  footer{padding:44px 0;border-top:1px solid var(--line);text-align:center}
+  footer p{font-size:14px}
+
+  /* ---------- WPP FLUTUANTE ---------- */
+  .float{position:fixed;bottom:20px;right:20px;z-index:95;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+
+  .marker{display:inline-block;background:rgba(201,123,74,.18);color:var(--accent2);
+    border:1px dashed rgba(201,123,74,.5);border-radius:6px;padding:1px 8px;font-size:13px;
+    font-weight:700;letter-spacing:.04em}
+
+  @media(max-width:760px){
+    section{padding:64px 0}
+    .split{grid-template-columns:1fr;gap:32px}
+    .ph.wide{grid-column:span 1;aspect-ratio:3/4}
+    .gatilho{flex-direction:column;align-items:flex-start}
+    .gatilho .btn{width:100%;justify-content:center}
+    .topbar .btn span.hide{display:none}
+    .float{bottom:14px;right:14px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ BARRA FIXA ============ -->
+<div class="topbar">
+  <div class="wrap">
+    <div class="logo">Bigette <span>Fotos e Vídeos</span></div>
+    <a class="btn btn-wpp btn-sm" href="#wpp">💬 <span class="hide">Chamar no&nbsp;</span>WhatsApp</a>
+  </div>
+</div>
+
+<!-- ============ 01 HERO ============ -->
+<header class="hero">
+  <div class="hero-note">Foto de abertura — a mais forte do portfólio</div>
+  <div class="wrap">
+    <div class="eyebrow">Ensaios · Eventos · Vídeo — <span class="marker">CIDADE</span></div>
+    <h1 class="serif">Você vai se ver de um jeito que ainda não viu.</h1>
+    <p class="lead">Não é uma sessão de fotos. É o dia em que você para tudo, olha pra câmera e descobre que sempre esteve bonita — só faltava alguém enxergar.</p>
+    <a class="btn btn-lg btn-wpp" href="#wpp">Quero garantir minha data →</a>
+    <div class="selo">📅 Atendo poucas sessões por mês para não entregar nada correndo.</div>
+  </div>
+</header>
+
+<!-- ============ FAIXA DE IMPACTO ============ -->
+<div class="faixa">
+  <div class="wrap">
+    <p class="serif">Todo mundo tem mil fotos no celular.<br>Quase ninguém tem uma que valha imprimir.</p>
+  </div>
+</div>
+
+<!-- ============ 02 A EXPERIÊNCIA ============ -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">O que acontece no dia</div>
+    <h2 class="serif">Você não precisa saber posar. Esse é o meu trabalho.</h2>
+    <p class="lead">A maior parte das pessoas chega dizendo a mesma frase: “eu sou péssima em foto”. Nenhuma delas sai dizendo isso.</p>
+
+    <div class="grid3">
+      <div class="card">
+        <span class="num serif">01</span>
+        <h3>Os 10 minutos que ninguém mostra</h3>
+        <p>No começo, ninguém sabe o que fazer com as mãos. A gente conversa, ri, erra algumas. Quando você esquece que a câmera está ali, começa a foto de verdade.</p>
+      </div>
+      <div class="card">
+        <span class="num serif">02</span>
+        <h3>Direção o tempo inteiro</h3>
+        <p>Onde olhar, o que fazer com a mão, quando respirar, quando rir. Você não vai ficar parada esperando eu dizer “pronto”. Eu conduzo do primeiro ao último clique.</p>
+      </div>
+      <div class="card">
+        <span class="num serif">03</span>
+        <h3>Fotos que saem do celular</h3>
+        <p>Não é para encher a galeria. É a foto que vira moldura na sala, presente pra sua mãe, e aquela do perfil que te fazem elogio até hoje.</p>
+      </div>
+    </div>
+
+    <div class="gatilho">
+      <p>Você não precisa estar pronta. Só precisa marcar.</p>
+      <a class="btn btn-wpp" href="#wpp">Me chama no WhatsApp →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 PORTFÓLIO ============ -->
+<section class="alt">
+  <div class="wrap">
+    <div class="eyebrow">Trabalhos recentes</div>
+    <h2 class="serif">Olha o que acontece quando alguém aponta a câmera pra você com atenção.</h2>
+
+    <div class="folio">
+      <div class="ph wide">Foto 01 — a mais forte</div>
+      <div class="ph">Foto 02</div>
+      <div class="ph">Foto 03</div>
+      <div class="ph">Foto 04</div>
+      <div class="ph">Foto 05</div>
+      <div class="ph">Foto 06</div>
+      <div class="ph wide">Foto 07 — horizontal</div>
+    </div>
+
+    <div class="gatilho">
+      <p>Imagina você aqui no meio dessas.</p>
+      <a class="btn btn-wpp" href="#wpp">Quero um ensaio assim →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 DEPOIMENTOS ============ -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">O que elas disseram ao ver as fotos</div>
+    <h2 class="serif">A reação é sempre a mesma. E nunca é sobre a foto.</h2>
+
+    <div class="depos">
+      <div class="depo"><q>Eu não sabia que era tão linda.</q><span>Ensaio feminino</span></div>
+      <div class="depo"><q>Chorei quando abri a galeria.</q><span>Ensaio gestante</span></div>
+      <div class="depo"><q>Meu marido não acreditou que era eu.</q><span>Ensaio aniversário</span></div>
+      <div class="depo"><q>Quero fazer todo ano agora.</q><span>Ensaio em família</span></div>
+    </div>
+
+    <div class="gatilho">
+      <p>A próxima frase dessa lista pode ser a sua.</p>
+      <a class="btn btn-wpp" href="#wpp">Quero marcar o meu →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 VÍDEO ============ -->
+<section class="alt">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <div class="eyebrow">Fotos <em>e</em> vídeos</div>
+        <h2 class="serif">Foto congela. Vídeo devolve o movimento.</h2>
+        <p class="lead">A risada de verdade, o jeito que você mexe o cabelo sem perceber, a voz. Daqui a dez anos, é o vídeo que você vai assistir chorando — e é ele que quase ninguém pensa em fazer na hora.</p>
+      </div>
+      <div class="ph" style="aspect-ratio:4/5">Frame do vídeo<br>ou reel em loop</div>
+    </div>
+
+    <div class="gatilho">
+      <p>Foto você vai ter. Vídeo, só se você pedir.</p>
+      <a class="btn btn-wpp" href="#wpp">Quero foto <em>e</em> vídeo →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 06 COMO FUNCIONA ============ -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">Simples assim</div>
+    <h2 class="serif">Do primeiro “oi” até as fotos na sua mão.</h2>
+
+    <div class="passos">
+      <div class="passo"><b class="serif">1</b><div><h3>Você me chama no WhatsApp</h3><p>Me conta o que você quer registrar. Em poucos minutos eu te mostro as opções e as datas livres.</p></div></div>
+      <div class="passo"><b class="serif">2</b><div><h3>A gente combina tudo antes</h3><p>Local, horário, roupas, referências. Você chega no dia sabendo exatamente o que vai acontecer.</p></div></div>
+      <div class="passo"><b class="serif">3</b><div><h3>O dia do ensaio</h3><p>Sem pressa e sem constrangimento. Eu dirijo cena por cena — você só precisa aparecer.</p></div></div>
+      <div class="passo"><b class="serif">4</b><div><h3>Você recebe</h3><p>Galeria online, fotos tratadas uma a uma, prontas para imprimir e para postar.</p></div></div>
+    </div>
+
+    <div class="gatilho">
+      <p>O passo 1 leva trinta segundos.</p>
+      <a class="btn btn-wpp" href="#wpp">Dar o primeiro passo →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 07 SOBRE ============ -->
+<section class="alt">
+  <div class="wrap">
+    <div class="split">
+      <div class="ph" style="aspect-ratio:1/1">Foto da Bigette</div>
+      <div>
+        <div class="eyebrow">Quem está atrás da câmera</div>
+        <h2 class="serif">Oi, eu sou a Bigette.</h2>
+        <p class="lead">Eu fotografo porque gosto do instante em que a pessoa esquece que está sendo fotografada. É ali que aparece a foto que ninguém consegue tirar no celular.<br><br>Trabalho com poucas sessões por mês, de propósito: eu quero lembrar do seu nome, da sua história e do motivo daquele ensaio quando estiver editando cada foto.</p>
+      </div>
+    </div>
+
+    <div class="gatilho">
+      <p>Me conta o que você quer registrar. Eu adoro essa parte.</p>
+      <a class="btn btn-wpp" href="#wpp">Contar pra Bigette →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 08 FAQ ============ -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">Antes que você pergunte</div>
+    <h2 class="serif">As dúvidas que sempre chegam.</h2>
+
+    <div class="faq">
+      <details open>
+        <summary>Quanto custa?</summary>
+        <p>Depende do que você quer: quanto tempo de ensaio, quantas fotos, se tem vídeo, se é em estúdio ou externo. Por isso eu não coloco uma tabela aqui — eu preferia te mandar a opção certa em vez de a mais cara. <strong>Me chama no WhatsApp que em dois minutos eu te mostro as opções e as datas livres.</strong></p>
+      </details>
+      <details>
+        <summary>Nunca fiz ensaio. Vou ficar sem graça?</summary>
+        <p>Todo mundo fica, nos primeiros dez minutos. Depois passa — e é justamente por isso que eu dirijo o ensaio inteiro. Você nunca vai ficar parada sem saber o que fazer.</p>
+      </details>
+      <details>
+        <summary>Quando eu recebo as fotos?</summary>
+        <p><span class="marker">PRAZO</span> dias úteis, em galeria online, com as fotos tratadas uma a uma. Se você precisar de alguma antes, é só falar que eu adianto.</p>
+      </details>
+      <details>
+        <summary>Você atende fora de <span class="marker">CIDADE</span>?</summary>
+        <p>Atendo. Acima de <span class="marker">XX km</span> tem uma taxa de deslocamento, que eu já te informo junto com as opções.</p>
+      </details>
+      <details>
+        <summary>Posso levar mais de uma roupa?</summary>
+        <p>Pode, e recomendo. A gente combina antes quantas trocas cabem no tempo do seu ensaio.</p>
+      </details>
+      <details>
+        <summary>E se chover no dia?</summary>
+        <p>A gente remarca sem custo nenhum. Nunca perdi uma sessão por causa de chuva — só mudei a data ou o lugar.</p>
+      </details>
+    </div>
+
+    <div class="gatilho">
+      <p>Ficou alguma dúvida que não está aqui?</p>
+      <a class="btn btn-wpp" href="#wpp">Perguntar direto →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 09 CTA FINAL ============ -->
+<section class="final" id="wpp">
+  <div class="wrap">
+    <div class="eyebrow">Última coisa</div>
+    <h2 class="serif">Daqui a um ano você vai querer ter essas fotos.</h2>
+    <p class="lead">A única diferença vai ser se você mandou a mensagem hoje ou não.</p>
+    <a class="btn btn-lg btn-wpp" href="https://wa.me/55DDDNUMERO?text=Oi%20Bigette!%20Vim%20pelo%20site%20e%20quero%20saber%20sobre%20um%20ensaio." target="_blank" rel="noopener">💬 Chamar a Bigette no WhatsApp</a>
+    <div class="selo">Respondo pessoalmente · <span class="marker">HORÁRIO</span> · <span class="marker">CIDADE</span> e região</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="logo" style="margin-bottom:10px">Bigette <span>Fotos e Vídeos</span></div>
+    <p>@bigette · <span class="marker">CIDADE</span> · <span class="marker">WHATSAPP</span></p>
+  </div>
+</footer>
+
+<a class="btn btn-wpp float" href="https://wa.me/55DDDNUMERO?text=Oi%20Bigette!%20Vim%20pelo%20site%20e%20quero%20saber%20sobre%20um%20ensaio." target="_blank" rel="noopener">💬 WhatsApp</a>
+
+</body>
+</html>

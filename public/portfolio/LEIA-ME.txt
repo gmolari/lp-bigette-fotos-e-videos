@@ -1,0 +1,31 @@
+FOTOS DO PORTFÓLIO
+==================
+
+Ponha as fotos aqui como  01.jpg  02.jpg  …  07.jpg
+(idealmente 1200 px no lado maior, otimizadas)
+
+O QUE ACONTECE SOZINHO
+----------------------
+Assim que o arquivo 01.jpg existir, as fotos entram automaticamente na
+cena 3D — nos prints pendurados do varal (#portfolio) e nas polaroides do
+fecho (#contato). Não precisa mexer em código.
+
+A página faz UMA requisição HEAD em 01.jpg para saber se as fotos já
+foram entregues. Enquanto não estiverem, aparece um 404 no console do
+navegador: é essa sonda, e é inofensiva. Sem ela seriam 19 tentativas
+falhando toda vez que a página abre.
+
+A margem de papel continua sendo desenhada; só o miolo vira a foto.
+
+O QUE AINDA É MANUAL
+--------------------
+A GRADE em 2D (a que aparece em celular, sem 3D) ainda usa <Placeholder>.
+Para trocar, descomente o bloco <Image> em:
+
+  src/components/sections/Sala.tsx     grade do portfólio
+  src/components/sections/Hero.tsx     foto de abertura → public/hero.jpg
+  src/components/sections/Video.tsx    frame do vídeo
+  src/components/sections/Sobre.tsx    foto da Bigette
+
+Os textos ALT já estão escritos em src/config/content.ts. Não apague —
+é o que faz as fotos aparecerem no Google Imagens.
