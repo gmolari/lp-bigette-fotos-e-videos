@@ -24,6 +24,42 @@ e podem fazer o site aparecer na busca **com o acordeão de perguntas aberto** �
 ocupando mais tela que o resultado do concorrente. É a maior alavanca de SEO
 disponível para uma página só.
 
+## ⚠️ `NEXT_PUBLIC_SITE_URL` já derrubou um build
+
+`layout.tsx` entrega esse valor ao `metadataBase`, que faz `new URL()`.
+**`new URL()` não aceita domínio sem protocolo** — e domínio sem
+protocolo é exatamente o que se digita num campo de painel:
+
+```
+NEXT_PUBLIC_SITE_URL=bigette.com.br
+  → TypeError: Invalid URL   (ERR_INVALID_URL)
+  → Failed to collect page data for /_not-found
+  → Build error occurred
+```
+
+A mensagem aponta para `/_not-found` e **não diz qual variável foi**.
+Pior: barra no fim passava sem reclamar. O formulário recusava um erro
+de digitação e aceitava o outro, sem explicar nenhum dos dois.
+
+Hoje `site.ts` **conserta** a entrada em vez de confiar nela — tira
+espaço em volta e barra no fim, põe `https://` se faltar, e cai no
+padrão se ainda assim não formar URL. Conferido com um build por forma:
+
+| valor da variável | resolve para |
+|---|---|
+| não definida | `https://bigette.com.br` |
+| `bigette.com.br` | `https://bigette.com.br` |
+| `https://bigette.com.br/` | `https://bigette.com.br` |
+| `␣␣https://bigette.com.br␣␣` | `https://bigette.com.br` |
+| `:// nao url` | `https://bigette.com.br` |
+| *(só `VERCEL_PROJECT_PRODUCTION_URL`)* | `https://lp-bigette.vercel.app` |
+
+Nenhuma quebra o build. E a última linha é de propósito: sem nenhuma
+variável configurada, a Vercel expõe `VERCEL_PROJECT_PRODUCTION_URL`
+sozinha, então **um deploy novo já sai com o canonical certo**. Ela só
+é lida no servidor — `site.url` não aparece em componente de cliente,
+então servidor e navegador não têm como discordar.
+
 ## robots.txt — a política
 
 ```
@@ -40,7 +76,7 @@ troca justa; scraper de treino não devolve nada.
 
 ## Checklist pós-deploy
 
-- [ ] `NEXT_PUBLIC_SITE_URL` preenchido no `.env.local` **sem barra no fim**
+- [ ] `NEXT_PUBLIC_SITE_URL` preenchido **com `https://` na frente**
 - [ ] `seusite.com/robots.txt` abre
 - [ ] `seusite.com/sitemap.xml` abre
 - [ ] [Rich Results Test](https://search.google.com/test/rich-results) — o FAQ é detectado?
