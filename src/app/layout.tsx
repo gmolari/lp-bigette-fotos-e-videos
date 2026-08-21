@@ -3,6 +3,7 @@ import { Fraunces, Instrument_Sans } from "next/font/google";
 import { site } from "@/config/site";
 import { allSchemas } from "@/lib/jsonld";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { Analytics } from "@/components/analytics/Analytics";
 import "./globals.css";
 
@@ -128,6 +129,7 @@ export default function RootLayout({
             fundo escuro e dá textura fotográfica. */}
         <div aria-hidden="true" className="grao-filme" />
         <Analytics />
+        <VercelAnalytics />
         {/* Speed Insights: Core Web Vitals de visitante real.
             Fica FORA do <Analytics /> de propósito, que é o bloco de
             terceiros ligado por ID no .env — este não tem ID e não é
