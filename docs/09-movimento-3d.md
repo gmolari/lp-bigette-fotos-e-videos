@@ -84,7 +84,37 @@ DESKTOP 1440px: canvas no DOM = 2 · three.js baixado = sim
 
 No celular o `import()` nunca acontece: o chunk não desce, não é
 interpretado e não gasta bateria. Sem 3D, `#portfolio` vira uma grade
-normal com as mesmas fotos e o mesmo texto.
+com as mesmas fotos.
+
+### A grade sem 3D usa DOIS mecanismos, um por largura
+
+Porque a aritmética muda. Paisagem ocupa o dobro de retrato: com 3
+paisagens e 4 retratos são **10 unidades**.
+
+**2 colunas — grade.** 10 ÷ 2 fecha exato, e a paisagem fica com a
+largura inteira. É o melhor arranjo para celular, de onde vem a maior
+parte do tráfego: a foto de abertura chega com 346px em vez de 167px.
+
+**3 colunas — mosaico (`columns`).** 10 ÷ 3 não fecha. A versão
+anterior deixava as duas últimas paisagens sozinhas ocupando 2 de 3
+colunas, com **dois buracos de coluna inteira** — ~700×800px de vazio e
+a borda direita rasgada até o fim da seção. Nenhum arranjo de
+`col-span` conserta: é o resto da divisão. Em multicol não existe
+célula vazia por construção; a sobra vira diferença de altura entre
+colunas.
+
+> ⚠️ **A diferença de altura de ~226px entre colunas é o mínimo
+> possível, não um defeito.** Com 4 retratos em 3 colunas, alguma
+> coluna leva dois (452+452 = 904px), então o máximo é ≥ 904; a melhor
+> partição de 2486px é {904, 904, 678}. Não tente "consertar"
+> reintroduzindo `col-span` — foi de lá que vieram os buracos.
+
+Testado um mosaico puro em todas as larguras antes disso: no celular a
+foto de abertura caía de 346px para 167px. Corrigia o desktop
+estragando o aparelho que mais importa.
+
+⚠️ **Se o número de fotos mudar, confira as DUAS larguras.** A grade de
+2 colunas só fecha enquanto o número de retratos for par.
 
 O laço de render também só roda enquanto a seção está na tela.
 

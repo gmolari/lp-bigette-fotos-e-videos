@@ -53,10 +53,38 @@ export function Sala() {
         <div className="container-lp">
           <Eyebrow>{c.eyebrow}</Eyebrow>
           <Title className="max-w-[24ch]">{c.titulo}</Title>
-          {/* `grid-auto-flow: dense` porque as deitadas ocupam duas
-              colunas: sem ele, sobra buraco toda vez que uma não cabe
-              no fim da linha. */}
-          <div className="mt-12 grid grid-cols-2 gap-3.5 [grid-auto-flow:dense] lg:grid-cols-3">
+          {/* ── A GRADE SEM 3D ──────────────────────────────────
+              Dois mecanismos, um por largura, porque a aritmética muda.
+
+              As paisagens ocupam o dobro das retratos. Com 3 paisagens
+              e 4 retratos são 3×2 + 4×1 = **10 unidades**.
+
+              • 2 COLUNAS → 10 ÷ 2 fecha exato. Grade de verdade, e a
+                paisagem ganha a largura inteira. É o melhor arranjo
+                para celular, que é de onde vem a maior parte do
+                tráfego: a foto de abertura chega com 346px em vez de
+                167px.
+
+              • 3 COLUNAS → 10 ÷ 3 NÃO fecha. Antes as duas últimas
+                paisagens ficavam sozinhas ocupando 2 de 3 colunas, e
+                sobravam dois buracos de coluna inteira — ~700×800px de
+                vazio, com a borda direita rasgada até o fim da seção.
+                Nenhum arranjo de `col-span` conserta isso; é o resto
+                da divisão. Então em `lg` a grade vira MOSAICO
+                (`columns`), onde não existe célula vazia por
+                construção: a sobra vira diferença de altura entre
+                colunas, que é o desenho, não defeito.
+
+              O `display` é que troca: `grid` embaixo, `block +
+              columns-3` no `lg`. As classes do outro modo ficam
+              inertes sozinhas — `col-span-2` não faz nada em multicol,
+              e `mb` só entra no `lg` porque em grade quem separa é o
+              `gap`.
+
+              ⚠️ Se o número de fotos mudar, confira as DUAS larguras.
+              A grade de 2 colunas só fecha enquanto o número de
+              retratos for par. */}
+          <div className="mt-12 grid grid-cols-2 gap-3.5 [grid-auto-flow:dense] lg:block lg:columns-3">
             {c.fotos.map((foto, i) => {
               const deitada = foto.formato === "paisagem";
               return (
@@ -64,7 +92,9 @@ export function Sala() {
                   key={foto.src}
                   variante="foco"
                   delay={i * 70}
-                  className={deitada ? "col-span-2" : ""}
+                  className={`lg:mb-3.5 lg:break-inside-avoid ${
+                    deitada ? "col-span-2" : ""
+                  }`}
                 >
                   <div
                     className={`relative overflow-hidden rounded-[16px] bg-bg-2 ${
@@ -75,7 +105,14 @@ export function Sala() {
                       src={foto.src}
                       alt={foto.alt}
                       fill
-                      sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 400px"
+                      /* A paisagem ocupa a largura toda até `lg`; a
+                         retrato, metade. Acima disso as duas viram
+                         coluna de ~360px. */
+                      sizes={
+                        deitada
+                          ? "(max-width:1024px) 100vw, 360px"
+                          : "(max-width:1024px) 50vw, 360px"
+                      }
                       className="object-cover"
                     />
                   </div>

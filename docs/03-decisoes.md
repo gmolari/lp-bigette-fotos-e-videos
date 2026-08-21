@@ -99,6 +99,22 @@ Página mais rápida, sem necessidade de banner de cookie.
 Rastreio que funciona sem ferramenta nenhuma: a mensagem do WhatsApp já abre com
 `(vim da seção: portfolio)` no fim. Dá para medir lendo as conversas.
 
+**Exceção, desde 21/08/2026: Vercel Speed Insights.** Fica ligado sempre e não
+passa pelo `<Analytics />`, porque não tem ID para preencher.
+
+Não fere a regra do banner de cookie: ele **não grava cookie nem identifica
+visitante**, então não pede consentimento. E é o único instrumento que faz
+sentido neste volume — com 30–100 visitas/mês não há amostra para medir
+conversão (`02-analise-economica.md`), mas LCP e CLS são medidos **por visita**,
+não por estatística. Uma visita já diz se a página abriu rápido.
+
+Em deploy na Vercel o script é servido pelo próprio domínio
+(`/_vercel/speed-insights/script.js`), então não é requisição a terceiro. Fora
+da Vercel o componente não envia nada.
+
+**Reverteria se:** sair da Vercel, ou se o script passar a custar tempo de
+carregamento mensurável — que é justamente o que ele existe para medir.
+
 ---
 
 ## D10 — robots.txt bloqueia scrapers de treino

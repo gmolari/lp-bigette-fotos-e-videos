@@ -101,6 +101,10 @@ que o site sozinho. Ele:
 Desligado por padrão. Se os IDs no `.env.local` ficarem vazios, nenhum script de
 terceiro carrega.
 
+**Menos o Speed Insights**, que fica sempre ligado (`<SpeedInsights />` em
+`layout.tsx`, fora do `<Analytics />` porque não tem ID). Sem cookie, sem
+consentimento, e na Vercel servido pelo próprio domínio. Ver D9.
+
 ```
 NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 NEXT_PUBLIC_META_PIXEL_ID=000000000000

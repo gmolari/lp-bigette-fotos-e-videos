@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, Instrument_Sans } from "next/font/google";
 import { site } from "@/config/site";
 import { allSchemas } from "@/lib/jsonld";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@/components/analytics/Analytics";
 import "./globals.css";
 
@@ -127,6 +128,21 @@ export default function RootLayout({
             fundo escuro e dá textura fotográfica. */}
         <div aria-hidden="true" className="grao-filme" />
         <Analytics />
+        {/* Speed Insights: Core Web Vitals de visitante real.
+            Fica FORA do <Analytics /> de propósito, que é o bloco de
+            terceiros ligado por ID no .env — este não tem ID e não é
+            desligável por lá.
+
+            Não contradiz a decisão D9 (nada de banner de cookie):
+            o Speed Insights não grava cookie nem identifica visitante,
+            então não pede consentimento. Só coleta em deploy na Vercel
+            — fora dela o componente não envia nada.
+
+            E é o único instrumento que faz sentido no volume desta
+            página: com 30–100 visitas/mês não há o que medir em
+            conversão (ver docs/02-analise-economica.md), mas LCP e CLS
+            são medidos por visita, não por amostra estatística. */}
+        <SpeedInsights />
       </body>
     </html>
   );
