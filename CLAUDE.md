@@ -99,7 +99,9 @@ Ao adicionar uma seção nova, ela precisa de um gatilho. É o padrão do projet
 🔒 **Contato real fora do repositório.** `site.ts` traz `5500000000000` e
    `seu_instagram` como placeholder — preencha os dois antes de deployar
 ✅ Paleta lilás derivada em OKLCH, 13/13 pares passam em WCAG AA — `docs/08-paleta.md`
-✅ Cena 3D em duas seções, com portão de capacidade — `docs/09-movimento-3d.md`
+✅ Cena 3D em duas seções, **inclusive no celular**, com enquadramento
+   próprio em retrato e o chunk (130 KB) baixado só perto da seção.
+   O portão de 900px caiu — ver `docs/09-movimento-3d.md`
 🟡 **Fotos do portfólio e hero são do Unsplash, provisórias** — `public/portfolio/CREDITOS.txt`.
    O `<Image>` já está ligado em `Sala.tsx` e `Hero.tsx`; `Video.tsx` e `Sobre.tsx` seguem em placeholder
 🔴 **Os 4 depoimentos são inventados e dois foram copiados de concorrente.**

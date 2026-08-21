@@ -168,3 +168,24 @@ export const site = {
 } as const;
 
 export type Site = typeof site;
+
+/**
+ * Grita no LOG DO BUILD quando o contato não foi configurado.
+ *
+ * Sem isto o sintoma aparece no lugar errado: o deploy passa verde e a
+ * página vai ao ar com os 11 CTAs abrindo conversa com 5500000000000.
+ * Já aconteceu uma vez. `NEXT_PUBLIC_*` é congelada no momento do
+ * build, então criar a variável depois não conserta o que já subiu —
+ * precisa de redeploy, e é isso que o aviso lembra.
+ */
+if (
+  typeof window === "undefined" &&
+  process.env.NODE_ENV === "production" &&
+  site.whatsapp.number === "5500000000000"
+) {
+  console.warn(
+    "\n⚠️  NEXT_PUBLIC_WHATSAPP não está definida — a página vai ao ar com número inválido.\n" +
+      "    Defina no ambiente (Production E Preview) e REDEPLOYE; criar a variável sozinha não\n" +
+      "    altera um build que já saiu.\n",
+  );
+}

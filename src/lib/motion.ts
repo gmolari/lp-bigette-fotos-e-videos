@@ -43,7 +43,11 @@ export function aguentaCena3D(): boolean {
 function calcularAguenta(): boolean {
   if (typeof window === "undefined") return false;
   if (semMovimento() || !suportaWebGL()) return false;
-  if (window.innerWidth < 900) return false;
+  // Não há mais portão de largura. A cena é o principal argumento
+  // visual da página e a maior parte do tráfego é celular — cortá-la
+  // justamente ali entregava a versão pobre para quase todo mundo.
+  // Quem continua de fora são os aparelhos que REALMENTE não aguentam,
+  // pelas checagens abaixo, e quem pediu menos movimento.
 
   const nav = navigator as Navigator & {
     deviceMemory?: number;

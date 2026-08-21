@@ -139,13 +139,20 @@ export function Sala() {
             aoProgredir={aoProgredir}
           />
 
-          {/* véu só do lado do texto, para o contraste não depender da cena */}
+          {/* Véu do lado do texto, para o contraste não depender da
+              cena. A direção acompanha o enquadramento: no celular o
+              texto mora EMBAIXO, então o véu sobe de baixo; no desktop
+              mora à ESQUERDA, e o véu vem da esquerda. Um véu
+              horizontal num celular deixaria o texto em cima do print,
+              que foi exatamente o que apareceu no primeiro teste. */}
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,var(--color-bg)_0%,var(--color-bg)_22%,rgba(10,9,17,.93)_38%,rgba(10,9,17,.6)_52%,transparent_70%)]"
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_0%,transparent_26%,rgba(10,9,17,.55)_42%,rgba(10,9,17,.92)_58%,var(--color-bg)_74%)] lg:bg-[linear-gradient(90deg,var(--color-bg)_0%,var(--color-bg)_22%,rgba(10,9,17,.93)_38%,rgba(10,9,17,.6)_52%,transparent_70%)]"
           />
 
-          <div className="container-lp relative flex h-full flex-col justify-center">
+          {/* Celular: texto ancorado embaixo, sob o véu vertical.
+              Desktop: centralizado na coluna da esquerda. */}
+          <div className="container-lp relative flex h-full flex-col justify-end pb-14 lg:justify-center lg:pb-0">
             <div className="max-w-[30rem]">
               <p className="mb-5 flex items-center gap-3 text-[11px] font-semibold tracking-[0.24em] text-ouro uppercase">
                 <span aria-hidden="true" className="h-px w-9 bg-ouro/70" />
@@ -187,7 +194,7 @@ export function Sala() {
                   Escrito como `style`, a propriedade animada e a
                   propriedade declarada são forçosamente a mesma coisa,
                   e não há utilitário no meio para divergir. */}
-              <div className="relative min-h-[23rem]">
+              <div className="relative min-h-[17.5rem] lg:min-h-[23rem]">
                 {c.estacoes.map((e, i) => {
                   const ativa = estacao === i;
                   const passou = i < estacao;

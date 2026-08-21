@@ -236,6 +236,36 @@ const PARADAS = [
 const DESLOCA_X = 0.27;
 
 /**
+ * ── ENQUADRAMENTO EM TELA ESTREITA (celular) ──────────────────────
+ *
+ * Em retrato não existe coluna de texto AO LADO — existe uma EMBAIXO.
+ * Então o assunto sobe no quadro em vez de ir para a direita, e o
+ * texto ocupa a metade de baixo com véu vertical por trás.
+ *
+ * `DESLOCA_Y` é quanto o assunto sobe, em fração da altura.
+ */
+const DESLOCA_Y = 0.12;
+
+/**
+ * Quanto a câmera RECUA em tela estreita.
+ *
+ * O `fov` do three.js é VERTICAL. Numa tela 9:19 o campo horizontal
+ * encolhe tanto que sobra um print só, perdido no meio do vazio — foi
+ * o que apareceu no primeiro teste em celular.
+ *
+ * A correção é recuar, não abrir o fov: abrir o suficiente para
+ * recuperar o campo horizontal do desktop pediria uns 100°, e a essa
+ * altura as bordas entortam. Esta cena inteira existe para parecer
+ * câmera de verdade — trocar isso por grande-angular de porta de
+ * peixe perde o ponto. Recuar mantém a lente honesta e ainda deixa o
+ * print inteiro no quadro.
+ */
+const RECUO_ESTREITA = 1.34;
+
+/** Abaixo disso a tela é tratada como retrato. */
+const LARGURA_LARGA = 900;
+
+/**
  * Zona morta da troca de parada, em unidades de parada.
  *
  * Só passa de uma parada para outra depois de ±0,62 — o que deixa uma
@@ -351,15 +381,21 @@ export function criarVaral(canvas: HTMLCanvasElement): Palco {
     destruir,
   };
 
+  let estreita = false;
+
   function redimensionar() {
     const l = canvas.clientWidth || window.innerWidth;
     const a = canvas.clientHeight || window.innerHeight;
     renderer.setSize(l, a, false);
     camera.aspect = l / a;
-    // Em tela estreita não há coluna de texto ao lado: o assunto volta
-    // para o centro e o texto passa a ficar por cima, com véu por baixo.
-    if (l >= 900) camera.setViewOffset(l, a, -l * DESLOCA_X, 0, l, a);
-    else camera.clearViewOffset();
+    estreita = l < LARGURA_LARGA;
+    // Larga: o assunto vai para a DIREITA, o texto mora à esquerda.
+    // Estreita: o assunto SOBE, o texto mora embaixo.
+    // Nos dois casos é o ponto principal que se desloca, não a mira —
+    // equivalente ao deslocamento de uma tilt-shift, e as verticais
+    // continuam retas.
+    if (!estreita) camera.setViewOffset(l, a, -l * DESLOCA_X, 0, l, a);
+    else camera.setViewOffset(l, a, 0, a * DESLOCA_Y, l, a);
     camera.updateProjectionMatrix();
   }
 
@@ -390,6 +426,13 @@ export function criarVaral(canvas: HTMLCanvasElement): Palco {
       lerp(a.alvo[1], b.alvo[1], f),
       lerp(a.alvo[2], b.alvo[2], f),
     );
+
+    // Em tela estreita a câmera recua ao longo da própria linha de
+    // visada — afasta do alvo mantendo o enquadramento, sem mexer em
+    // para onde ela olha.
+    if (estreita) {
+      vPos.sub(vAlvo).multiplyScalar(RECUO_ESTREITA).add(vAlvo);
+    }
 
     // respiração lenta, para a câmera nunca ficar morta parada
     camera.position.set(

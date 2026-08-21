@@ -71,20 +71,91 @@ scroll: só existe e respira.
 
 ### O portão — `aguentaCena3D()`
 
-Em `src/lib/motion.ts`. Reprova se: movimento reduzido, sem WebGL, tela
-< 900 px, economia de dados ligada, menos de 4 GB de RAM ou menos de 4
-núcleos. O resultado é memorizado.
+Em `src/lib/motion.ts`. Reprova se: movimento reduzido, sem WebGL,
+economia de dados ligada, menos de 4 GB de RAM ou menos de 4 núcleos.
+O resultado é memorizado.
 
-**Verificado com navegador real:**
+### 🔄 O portão de 900px CAIU — a cena roda no celular
+
+Até 21/08/2026 havia também `innerWidth < 900`, e o argumento era bom:
+a maior parte do tráfego é celular, e lá a página precisa abrir.
+
+O argumento estava errado pelo mesmo motivo que o tornava convincente.
+A cena É o argumento visual da página. Cortá-la exatamente onde está
+quase todo mundo significava que quase ninguém via a página — via a
+versão pobre dela. O portão protegia a métrica e entregava o produto
+errado.
+
+Medido antes de decidir, com CPU estrangulada em 4× e renderização por
+software (`swiftshader`), que é **pior que celular real**, já que o
+celular tem GPU e ali é tudo CPU:
 
 ```
-MOBILE  390px: canvas no DOM = 0 · three.js baixado = NÃO
-DESKTOP 1440px: canvas no DOM = 2 · three.js baixado = sim
+mediana 16,7 ms (60 fps) · p95 33,4 ms · pior quadro 49,9 ms
+quadros acima de 50 ms: 0 de 201
 ```
 
-No celular o `import()` nunca acontece: o chunk não desce, não é
-interpretado e não gasta bateria. Sem 3D, `#portfolio` vira uma grade
-com as mesmas fotos.
+Não é um aparelho sofrendo. E as checagens que sobraram continuam
+barrando quem realmente não aguenta — menos de 4 GB de RAM, menos de 4
+núcleos, economia de dados ligada — além de quem pediu menos
+movimento, que cai na grade 2D em qualquer largura.
+
+**O que a cena custa: 130 KB gzip** (527 KB bruto).
+
+### O chunk só desce quando a seção se aproxima
+
+Enquanto era só desktop, importar no `mount` não pesava. Com celular
+incluído, isso põe 130 KB para disputar banda com a foto do hero — que
+é o que a pessoa está esperando ver.
+
+`Palco3D` tem agora DOIS observadores: um de aproximação
+(`rootMargin: 150%`), que só dispara o `import()`, e o de sempre
+(`10%`), criado lá dentro, que liga e desliga o laço de render.
+
+**Verificado contra o build de PRODUÇÃO** — em `npm run dev` o
+Turbopack não faz o mesmo code-splitting e o teste dá falso positivo:
+
+```
+topo da página      → chunk 3D baixado? não
+~1,4 tela antes     → baixado (528 KB)
+chegando na seção   → canvas prontos, cena montada
+```
+
+> ⚠️ Ao medir isto de novo, **rode contra `npm run start`, não contra
+> `npm run dev`** — e detecte o chunk pelo TAMANHO, não pelo nome: em
+> produção ele é um hash, sem "three" nem "cenas" no nome. As duas
+> armadilhas deram resultado errado na primeira tentativa.
+
+### Enquadramento em retrato
+
+Em tela estreita não existe coluna de texto AO LADO — existe uma
+EMBAIXO. Três coisas mudam junto, e nenhuma sozinha resolve:
+
+| | tela larga | tela estreita |
+|---|---|---|
+| ponto principal | assunto vai para a DIREITA (`DESLOCA_X`) | assunto SOBE (`DESLOCA_Y`) |
+| câmera | posição das paradas | recua `RECUO_ESTREITA` |
+| véu | gradiente da esquerda | gradiente de baixo |
+| texto | centralizado na coluna | ancorado no rodapé |
+
+**Por que recuar em vez de abrir o `fov`:** o `fov` do three.js é
+VERTICAL. Numa tela 9:19 o campo horizontal encolhe tanto que sobra um
+print só, perdido no vazio — foi literalmente o primeiro teste em
+celular. Recuperar o campo horizontal do desktop abrindo o fov pediria
+uns 100°, e a essa altura as bordas entortam. Esta cena inteira existe
+para parecer câmera de verdade; trocar isso por grande-angular de porta
+de peixe perde o ponto.
+
+**E o véu precisa girar junto.** No primeiro teste ele continuou
+horizontal, e o resultado foi o texto atravessando o rosto do print,
+ilegível. Véu é uma decisão de enquadramento, não um detalhe de estilo:
+ele escurece o lado onde o texto mora, e no celular esse lado é outro.
+
+Conferido de olho nas 4 paradas e no `#contato`, em Pixel 7 e
+iPhone 13. As paradas percorrem `0 → 1 → 2 → 3` no celular.
+
+Sem 3D — movimento reduzido, aparelho fraco, sem WebGL — `#portfolio`
+vira uma grade com as mesmas fotos.
 
 ### A grade sem 3D usa DOIS mecanismos, um por largura
 

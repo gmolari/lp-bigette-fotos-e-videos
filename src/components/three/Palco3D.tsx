@@ -54,7 +54,17 @@ export function Palco3D({ tipo, refTrilho, aoTrocarEstacao, aoProgredir, classNa
     let obs: IntersectionObserver | null = null;
     const desliga: Array<() => void> = [];
 
-    (async () => {
+    /**
+     * O chunk do three.js (130 KB gzip) só é BAIXADO quando o trilho
+     * chega perto da tela — não no mount.
+     *
+     * Enquanto a cena era só de desktop isso não pesava. Com celular
+     * incluído, importar no mount põe 130 KB para disputar banda com a
+     * foto do hero, que é o que a pessoa realmente está esperando ver.
+     * Uma tela e meia de antecedência dá tempo de sobra para baixar e
+     * montar antes de a seção aparecer.
+     */
+    const iniciar = async () => {
       const mod = await import("./cenas");
       if (!vivo) return;
       palco = tipo === "varal" ? mod.criarVaral(canvas) : mod.criarPolaroides(canvas);
@@ -87,10 +97,23 @@ export function Palco3D({ tipo, refTrilho, aoTrocarEstacao, aoProgredir, classNa
       const onVis = () => palco?.setAtivo(!document.hidden);
       document.addEventListener("visibilitychange", onVis);
       desliga.push(() => document.removeEventListener("visibilitychange", onVis));
-    })();
+    };
+
+    // Observador só para disparar o download, com antecedência bem
+    // maior que a do observador de "está na tela" criado lá dentro.
+    const aproximacao = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        aproximacao.disconnect();
+        void iniciar();
+      },
+      { rootMargin: "150% 0px" },
+    );
+    aproximacao.observe(trilho);
 
     return () => {
       vivo = false;
+      aproximacao.disconnect();
       cancelAnimationFrame(raf);
       desliga.forEach((f) => f());
       obs?.disconnect();
