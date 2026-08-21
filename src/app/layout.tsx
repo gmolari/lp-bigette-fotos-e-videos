@@ -3,6 +3,7 @@ import { Fraunces, Instrument_Sans } from "next/font/google";
 import { site } from "@/config/site";
 import { allSchemas } from "@/lib/jsonld";
 import { Analytics } from "@/components/analytics/Analytics";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 /**
@@ -127,6 +128,7 @@ export default function RootLayout({
             fundo escuro e dá textura fotográfica. */}
         <div aria-hidden="true" className="grao-filme" />
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
