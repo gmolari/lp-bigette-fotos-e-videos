@@ -50,6 +50,25 @@ function normalizarUrl(bruto: string | undefined, padrao: string): string {
   }
 }
 
+/**
+ * Só os dígitos. Aceita `+55 (43) 9 8477-5395` e devolve
+ * `5543984775395` — porque quem preenche a variável copia do celular,
+ * com parênteses e traço, e o link do WhatsApp precisa de dígito puro.
+ */
+const soDigitos = (v: string | undefined) => v?.replace(/\D/g, "") ?? "";
+
+/**
+ * Só o handle. Aceita `@bigette`, `bigette` ou a URL inteira do perfil,
+ * e devolve `bigette`. Mesma ideia: o valor vem colado da barra de
+ * endereço, não digitado no formato que o código espera.
+ */
+const soHandle = (v: string | undefined) =>
+  v
+    ?.trim()
+    .replace(/^https?:\/\/(www\.)?instagram\.com\//i, "")
+    .replace(/^@/, "")
+    .replace(/\/+$/, "") ?? "";
+
 export const site = {
   // ---------- IDENTIDADE ----------
   name: "Bigette Fotos e Vídeos",
@@ -80,16 +99,28 @@ export const site = {
 
   // ---------- CONTATO ----------
   whatsapp: {
-    // Só números, com DDI+DDD.
-    // ⚠️ PREENCHER — o número real da Bigette foi retirado antes de este
-    // repositório ir a público. Sem ele, os 11 CTAs abrem uma conversa
-    // com um número inválido: preencha antes de qualquer deploy.
-    number: "5500000000000",
+    /**
+     * O número real NÃO mora neste repositório, que é público — vem de
+     * `NEXT_PUBLIC_WHATSAPP` no ambiente. Precisa do prefixo público
+     * porque os botões são componentes de cliente.
+     *
+     * Não é segredo: ele fica visível na página, em todo link do
+     * WhatsApp. Sair do código é só para não ficar no histórico do git
+     * nem em busca de código do GitHub.
+     *
+     * ⚠️ Sem a variável, os 11 CTAs abrem conversa com número inválido.
+     */
+    number: soDigitos(process.env.NEXT_PUBLIC_WHATSAPP) || "5500000000000",
     defaultMessage:
       "Oi Bigette! Vim pelo site e quero saber sobre um ensaio.",
   },
-  email: "contato@bigette.com.br", // ⚠️ PREENCHER
-  instagram: "seu_instagram", // ⚠️ PREENCHER — handle real retirado do repo público
+  /**
+   * Vazio de propósito quando não configurado: entra no JSON-LD, e
+   * endereço inventado em dado estruturado é pior que endereço ausente
+   * — mesma regra de `postalCode` acima. Campo vazio é omitido.
+   */
+  email: process.env.NEXT_PUBLIC_EMAIL?.trim() ?? "",
+  instagram: soHandle(process.env.NEXT_PUBLIC_INSTAGRAM) || "seu_instagram",
   horarioAtendimento: "Seg a Sáb, 9h às 20h", // ⚠️ PREENCHER
   prazoEntregaDias: 10,            // ⚠️ PREENCHER
 
@@ -103,7 +134,7 @@ export const site = {
   url: normalizarUrl(
     process.env.NEXT_PUBLIC_SITE_URL ??
       process.env.VERCEL_PROJECT_PRODUCTION_URL,
-    "https://bigette.com.br",
+    "https://bigettefotosevideos.com.br",
   ),
   locale: "pt_BR",
   title: `Bigette Fotos e Vídeos — Ensaios e Vídeos em ${CIDADE}`,

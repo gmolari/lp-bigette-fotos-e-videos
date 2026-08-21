@@ -31,7 +31,7 @@ disponível para uma página só.
 protocolo é exatamente o que se digita num campo de painel:
 
 ```
-NEXT_PUBLIC_SITE_URL=bigette.com.br
+NEXT_PUBLIC_SITE_URL=bigettefotosevideos.com.br
   → TypeError: Invalid URL   (ERR_INVALID_URL)
   → Failed to collect page data for /_not-found
   → Build error occurred
@@ -47,11 +47,11 @@ padrão se ainda assim não formar URL. Conferido com um build por forma:
 
 | valor da variável | resolve para |
 |---|---|
-| não definida | `https://bigette.com.br` |
-| `bigette.com.br` | `https://bigette.com.br` |
-| `https://bigette.com.br/` | `https://bigette.com.br` |
-| `␣␣https://bigette.com.br␣␣` | `https://bigette.com.br` |
-| `:// nao url` | `https://bigette.com.br` |
+| não definida | `https://bigettefotosevideos.com.br` |
+| `bigettefotosevideos.com.br` | `https://bigettefotosevideos.com.br` |
+| `https://bigettefotosevideos.com.br/` | `https://bigettefotosevideos.com.br` |
+| `␣␣https://bigettefotosevideos.com.br␣␣` | `https://bigettefotosevideos.com.br` |
+| `:// nao url` | `https://bigettefotosevideos.com.br` |
 | *(só `VERCEL_PROJECT_PRODUCTION_URL`)* | `https://lp-bigette.vercel.app` |
 
 Nenhuma quebra o build. E a última linha é de propósito: sem nenhuma

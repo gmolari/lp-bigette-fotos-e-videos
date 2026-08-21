@@ -23,7 +23,10 @@ export function localBusinessSchema() {
     description: site.description,
     url: site.url,
     telephone: telE164(),
-    email: site.email,
+    // Omitido quando vazio, como postalCode: dado ausente é melhor que
+    // dado inventado — e um e-mail que não existe em dado estruturado
+    // vira endereço de contato que ninguém lê.
+    ...(site.email ? { email: site.email } : {}),
     image: id("/opengraph-image"),
     logo: id("/icon.png"),
     priceRange: "$$",
