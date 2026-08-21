@@ -21,7 +21,7 @@ export function Depoimentos() {
                 aria-hidden="true"
                 className="mb-4 text-accent/55"
               />
-              <blockquote className="mb-4 font-display text-[23px] leading-tight text-cream italic">
+              <blockquote className="mb-4 font-display-italico text-[23px] leading-tight text-cream italic">
                 {d.frase}
               </blockquote>
               <figcaption className="text-[12px] tracking-[0.16em] text-ouro uppercase">

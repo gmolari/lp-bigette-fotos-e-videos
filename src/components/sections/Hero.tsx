@@ -132,32 +132,32 @@ export function Hero() {
 
       {/* CAMADA 3 — o conteúdo */}
       <div className="container-lp [transform:translate3d(var(--texto-x,0px),var(--texto-y,0px),0)]">
-        <Reveal variante="left">
+        <Reveal variante="left" imediato>
           <p className="mb-5 flex items-center gap-3 text-[11px] font-semibold tracking-[0.24em] text-ouro uppercase">
             <span aria-hidden="true" className="h-px w-9 bg-ouro/70" />
             {content.hero.eyebrow} — {site.city}
           </p>
         </Reveal>
 
-        <Reveal variante="cortina" delay={90}>
+        <Reveal variante="cortina" delay={90} imediato>
           <h1 className="max-w-[15ch] font-display text-[clamp(42px,8vw,76px)] leading-[1.02] tracking-[-0.02em] [text-shadow:0_2px_28px_rgba(10,9,17,.55)]">
             {content.hero.title}
           </h1>
         </Reveal>
 
-        <Reveal variante="up" delay={230}>
+        <Reveal variante="up" delay={230} imediato>
           <p className="my-7 max-w-[54ch] text-[clamp(17px,2.1vw,21px)] leading-relaxed text-cream/80 [text-shadow:0_1px_16px_rgba(10,9,17,.6)]">
             {content.hero.lead}
           </p>
         </Reveal>
 
-        <Reveal variante="up" delay={340}>
+        <Reveal variante="up" delay={340} imediato>
           <WhatsAppButton source="hero" size="lg" seta>
             {content.hero.cta}
           </WhatsAppButton>
         </Reveal>
 
-        <Reveal variante="up" delay={440}>
+        <Reveal variante="up" delay={440} imediato>
           <p className="mt-7 flex items-center gap-2.5 text-sm text-cream/70">
             <CalendarDays
               size={16}

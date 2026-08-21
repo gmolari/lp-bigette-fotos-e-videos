@@ -26,6 +26,20 @@ type Props = {
   limiar?: number;
   /** false = anima toda vez que entra e sai da tela */
   umaVez?: boolean;
+  /**
+   * ACIMA DA DOBRA: anima na carga, em CSS puro, sem esperar o
+   * IntersectionObserver.
+   *
+   * O hero está visível desde o primeiro quadro — não há o que
+   * observar. Esperar o observador significa esperar o JS baixar,
+   * interpretar e hidratar, e o elemento fica em `opacity: 0` até lá.
+   *
+   * Medido (Pixel 7 · 4G): com o observador, FCP 716ms e **LCP
+   * 3096ms** — o LCP da página é o <h1> do hero, então ele estava
+   * atrás do JavaScript inteiro. Sem CPU estrangulada nenhuma: era
+   * espera de hidratação, não de processamento.
+   */
+  imediato?: boolean;
 };
 
 /**
@@ -43,11 +57,13 @@ export function Reveal({
   className = "",
   limiar = 0.16,
   umaVez = true,
+  imediato = false,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [visivel, setVisivel] = useState(false);
 
   useEffect(() => {
+    if (imediato) return; // anima sozinho, em CSS
     const el = ref.current;
     if (!el) return;
 
@@ -75,7 +91,7 @@ export function Reveal({
 
     obs.observe(el);
     return () => obs.disconnect();
-  }, [limiar, umaVez]);
+  }, [limiar, umaVez, imediato]);
 
   const Comp = as as "div";
 
@@ -84,7 +100,10 @@ export function Reveal({
       ref={ref}
       className={className}
       data-reveal={variante}
-      data-shown={visivel ? "true" : undefined}
+      /* `data-shown` já sai do SERVIDOR no modo imediato: é o que tira
+         o elemento do estado escondido antes de existir JavaScript. */
+      data-shown={imediato || visivel ? "true" : undefined}
+      data-imediato={imediato ? "true" : undefined}
       style={delay ? ({ "--reveal-delay": `${delay}ms` } as React.CSSProperties) : undefined}
     >
       {children}

@@ -67,6 +67,12 @@
      mais que a classificação. */
   --font-sans: var(--font-corpo), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-display-face), Georgia, serif;
+  /* A itálica é um arquivo separado e SEM pré-carga — só aparece nos
+     gatilhos e nos depoimentos, a duas telas do topo. Use
+     `font-display-italico italic`, não `font-display italic`: sem a
+     família certa o navegador inclina a romana por conta própria, e
+     oblíqua sintética não é o desenho da Fraunces itálica. */
+  --font-display-italico: var(--font-display-italico-face), Georgia, serif;
 
   /* ---------- CURVAS DE MOVIMENTO ----------
      Uma curva só para tudo faz o site parecer genérico. São três:
@@ -252,6 +258,32 @@
   opacity: 1;
   transform: none;
   filter: none;
+}
+
+/* ── MODO IMEDIATO (acima da dobra) ──────────────────────────────
+   Aqui a entrada é KEYFRAME, não transição.
+
+   O modo normal depende de uma troca de estado — `data-shown` vira
+   "true" quando o observador dispara — e troca de estado exige
+   JavaScript. Acima da dobra isso põe o elemento de LCP da página
+   atrás do bundle inteiro: medido, LCP 3096ms contra FCP 716ms.
+
+   Um keyframe roda sozinho assim que o CSS chega, sem esperar
+   hidratação, e ainda funciona com JavaScript desligado. É o mesmo
+   princípio do `foco-hero` da foto, que já era assim.
+
+   O `data-shown="true"` vem do servidor junto, para o elemento não
+   nascer no `opacity: 0` da regra base. */
+[data-reveal][data-imediato="true"] {
+  animation: revelar 0.85s var(--ease-out) both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+@keyframes revelar {
+  from { opacity: 0; transform: translate3d(0, 26px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal][data-imediato="true"] { animation: none; }
 }
 
 /* Sem JavaScript ou com movimento reduzido, nada fica escondido. */

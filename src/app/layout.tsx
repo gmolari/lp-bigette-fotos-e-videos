@@ -24,10 +24,43 @@ import "./globals.css";
  */
 const display = Fraunces({
   subsets: ["latin"],
-  style: ["normal", "italic"],
-  axes: ["SOFT", "WONK", "opsz"],
+  // `opsz` fica: o navegador aplica sozinho por tamanho de fonte
+  // (`font-optical-sizing: auto` é o padrão), então tirá-lo MUDA o
+  // desenho dos títulos grandes.
+  //
+  // `SOFT` e `WONK` saíram. Eles eram a justificativa escrita para
+  // escolher a Fraunces, mas nunca foram VARIADOS: não existe um
+  // `font-variation-settings` em lugar nenhum do projeto. Ficavam só
+  // engordando o arquivo com dados de eixo que ninguém movia. O
+  // desenho torto continua — é o padrão da fonte, não dos eixos.
+  axes: ["opsz"],
   variable: "--font-display-face",
   display: "swap",
+});
+
+/**
+ * A Fraunces itálica é um SEGUNDO carregamento, sem pré-carga.
+ *
+ * Ela só aparece nos 11 gatilhos e nos depoimentos — o primeiro deles
+ * está a umas duas telas de distância. Pré-carregar 66 KB que ninguém
+ * vê ainda é competir com o H1 do hero, que é justamente o elemento de
+ * LCP da página.
+ *
+ * Medido na cascata (Pixel 7 · 4G · CPU 4×): as fontes são a MAIOR
+ * transferência do primeiro carregamento, maiores que todo o
+ * JavaScript somado, e terminavam por último.
+ *
+ * `display: swap` continua: quem chegar num gatilho antes da fonte
+ * ficar pronta lê em Georgia por um instante. É um preço pequeno, e só
+ * na primeira visita.
+ */
+const displayItalico = Fraunces({
+  subsets: ["latin"],
+  style: ["italic"],
+  axes: ["opsz"],
+  variable: "--font-display-italico-face",
+  display: "swap",
+  preload: false,
 });
 
 const corpo = Instrument_Sans({
@@ -100,7 +133,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR" className={`${display.variable} ${corpo.variable}`}>
+    <html lang="pt-BR" className={`${display.variable} ${displayItalico.variable} ${corpo.variable}`}>
       <head>
         {/* Dados estruturados — LocalBusiness, FAQ, Person, WebSite */}
         <script

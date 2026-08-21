@@ -74,6 +74,77 @@ BLOQUEADO:  GPTBot, CCBot, ClaudeBot, anthropic-ai,
 Racional: as fotos são o ativo do negócio. Buscador que manda visitante de volta é
 troca justa; scraper de treino não devolve nada.
 
+## Performance — o que foi medido e corrigido
+
+Tudo medido contra o build de PRODUÇÃO, em Pixel 7 emulado, rede 4G
+(1,6 Mbps · 150 ms) e CPU estrangulada.
+
+| | antes | depois |
+|---|---|---|
+| **LCP** | 3096 ms | **1096 ms** |
+| fotos baixadas pela cena 3D | 1259 KB | **84 KB** |
+| fontes no percurso todo | 293 KB | **175 KB** |
+| fontes pré-carregadas | 293 KB | **95 KB** |
+| CLS | 0,0001 | 0,0017 |
+| TBT | 89 ms | 39 ms |
+
+### 1. O LCP estava atrás do JavaScript inteiro
+
+O elemento de LCP é o `<h1>` do hero, e ele vivia dentro de um
+`<Reveal>` — que começa em `opacity: 0` e só aparece quando o
+IntersectionObserver dispara. Ou seja: **o maior elemento da página
+esperava o bundle baixar, interpretar e hidratar.**
+
+Medido sem estrangular a CPU nenhuma vez: FCP 716 ms, LCP 3096 ms. A
+diferença não era processamento, era espera de hidratação.
+
+O hero está visível desde o primeiro quadro — não há o que observar.
+Agora o `<Reveal>` aceita `imediato`, que troca a transição por um
+**keyframe** e manda `data-shown="true"` já do servidor. Keyframe roda
+assim que o CSS chega, sem JavaScript. Mesmo princípio do `foco-hero`
+da foto, que já era assim.
+
+Resultado: **LCP 1096 ms**, e segura em 1144 ms com CPU 4× estrangulada
+— ou seja, deixou de ser um problema de espera.
+
+> ⚠️ `imediato` é só para **acima da dobra**. Abaixo dela o observador
+> é o certo: anima quando a pessoa chega, e não gasta nada antes.
+
+### 2. A cena 3D baixava as fotos originais
+
+As texturas dos prints são desenhadas num canvas de 300×375, e a cena
+carregava o JPEG original — uns 2000 px e 250 KB cada. **1259 KB no
+celular, mais que o JavaScript e as fontes somados**, e invisível para
+qualquer auditoria: as fotos não passam por `<Image>`, então nenhuma
+otimização do Next as alcançava.
+
+Agora passam pelo otimizador (`/_next/image?w=384&q=75`). **84 KB**,
+com os prints visualmente idênticos — conferido em captura.
+
+### 3. Metade das fontes não era usada
+
+`SOFT` e `WONK` eram declarados no `next/font` e **nunca variados** —
+não existe um `font-variation-settings` em lugar nenhum do projeto.
+Só engordavam o arquivo. `opsz` ficou, porque o navegador o aplica
+sozinho por tamanho de fonte e removê-lo mudaria o desenho.
+
+A itálica virou um segundo carregamento **sem pré-carga**: ela só
+aparece nos gatilhos e nos depoimentos, a duas telas do topo, e
+pré-carregar 66 KB que ninguém vê é competir com o `<h1>`.
+
+> Use `font-display-italico italic`, não `font-display italic` — sem a
+> família certa o navegador inclina a romana por conta própria, e
+> oblíqua sintética não é o desenho da Fraunces itálica.
+
+### O que NÃO foi feito, e por quê
+
+**Sitemap de imagens.** É a forma canônica de mandar as fotos para o
+Google Imagens, e faz falta: com a cena 3D ativa, só o hero fica como
+`<img>` no DOM. Mas as fotos de hoje são do Unsplash — submeter um
+sitemap de imagens agora é declarar ao Google que fotos de terceiros
+são dela. Fica para quando as fotos reais entrarem; são ~10 linhas em
+`src/app/sitemap.ts`.
+
 ## Checklist pós-deploy
 
 - [ ] `NEXT_PUBLIC_SITE_URL` preenchido **com `https://` na frente**

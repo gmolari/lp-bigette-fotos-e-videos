@@ -46,6 +46,24 @@ function fotosEntregues(): Promise<boolean> {
   return _temFotos;
 }
 
+/**
+ * A textura de um print é desenhada num canvas de 300×375. O JPEG
+ * original tem uns 2000px e 250 KB — dez vezes mais pixel do que a GPU
+ * chega a usar.
+ *
+ * Medido no celular, antes: 1259 KB de fotos CRUAS baixadas pela cena,
+ * mais que o JavaScript e as fontes somados. Era, de longe, o maior
+ * custo da página, e invisível: as fotos não passam por <Image>, então
+ * nenhuma otimização do Next as alcançava.
+ *
+ * 384px é de propósito um pouco maior que o canvas, para o recorte
+ * `cover` ter folga. Precisa estar em `images.imageSizes` no
+ * next.config.ts — largura fora daquela lista o otimizador recusa.
+ */
+const LARGURA_TEXTURA = 384;
+const urlOtimizada = (src: string) =>
+  `/_next/image?url=${encodeURIComponent(src)}&w=${LARGURA_TEXTURA}&q=75`;
+
 function carregarImagem(url: string): Promise<HTMLImageElement | null> {
   return new Promise((resolve) => {
     const img = new Image();
@@ -592,7 +610,9 @@ async function aplicarFotosReais(
 
   await Promise.all(
     materiais.map(async (mat, i) => {
-      const foto = await carregarImagem(FOTOS[i % FOTOS.length]);
+      const foto = await carregarImagem(
+        urlOtimizada(FOTOS[i % FOTOS.length]),
+      );
       if (!foto || !aindaVivo()) return;
       const nova = fazerTextura(i, foto);
       mat.map?.dispose();

@@ -20,7 +20,7 @@ export function Gatilho({ frase, cta, source }: Props) {
           decoração, não informação — e onze deles na mesma página
           davam à peça um aspecto de template. */}
       <div className="flex flex-wrap items-center justify-between gap-5 rounded-[20px] border border-accent/25 bg-accent/[0.06] px-7 py-6">
-        <p className="max-w-[46ch] font-display text-xl leading-snug text-lilas-200 italic sm:text-2xl">
+        <p className="max-w-[46ch] font-display-italico text-xl leading-snug text-lilas-200 italic sm:text-2xl">
           {frase}
         </p>
         <WhatsAppButton source={source} seta className="max-sm:w-full">
