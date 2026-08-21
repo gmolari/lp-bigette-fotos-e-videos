@@ -5,7 +5,7 @@ import { whatsappDisplay } from "@/lib/whatsapp";
 
 export function Footer() {
   return (
-    <footer className="relative z-1 border-t border-line bg-bg py-14 text-center">
+    <footer className="relative z-1 border-t border-line bg-bg py-10 text-center sm:py-14">
       <div className="container-lp">
         <p className="mb-4 font-display text-[21px]">
           {site.shortName} <span className="text-accent">Fotos e Vídeos</span>
@@ -33,7 +33,7 @@ export function Footer() {
           </li>
         </ul>
 
-        <p className="mt-6 text-xs text-muted/55">
+        <p className="mt-5 text-xs text-muted/55 sm:mt-6">
           © {new Date().getFullYear()} {site.legalName}. Todas as imagens são de
           autoria própria e protegidas por direitos autorais.
         </p>

@@ -23,7 +23,16 @@ export function CtaFinal() {
     <section
       id="contato"
       ref={trilho}
-      className="relative z-1 overflow-hidden bg-bg py-28 text-center sm:py-[132px]"
+      /* No celular a seção reserva quase uma tela inteira e centraliza
+         o conteúdo: o canvas é `inset-0` da seção, então altura da
+         seção É espaço de cena. Antes ela media pouco mais que o
+         próprio texto, o rodapé subia junto e as polaroides — que são
+         a última imagem que fica — apareciam por uma fresta.
+
+         É `svh` e não `vh`: no celular a barra do navegador entra e
+         sai, e `vh` usa a altura MAIOR — o rodapé voltaria a aparecer
+         embaixo sempre que a barra estivesse visível. */
+      className="relative z-1 flex min-h-svh items-center overflow-hidden bg-bg py-24 text-center sm:block sm:min-h-0 sm:py-[132px]"
     >
       <Palco3D tipo="polaroides" refTrilho={trilho} />
 
@@ -33,7 +42,7 @@ export function CtaFinal() {
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(52%_54%_at_50%_48%,rgba(10,9,17,.9)_0%,rgba(10,9,17,.62)_62%,rgba(10,9,17,.25)_100%)]"
       />
 
-      <div className="container-lp relative">
+      <div className="container-lp relative w-full">
         <Reveal variante="up">
           <p className="mb-5 flex items-center justify-center gap-3 text-[11px] font-semibold tracking-[0.24em] text-ouro uppercase">
             <span aria-hidden="true" className="h-px w-9 bg-ouro/70" />

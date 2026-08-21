@@ -194,7 +194,16 @@ export function Sala() {
                   Escrito como `style`, a propriedade animada e a
                   propriedade declarada são forçosamente a mesma coisa,
                   e não há utilitário no meio para divergir. */}
-              <div className="relative min-h-[17.5rem] lg:min-h-[23rem]">
+              {/* Empilhamento em GRADE, não em `absolute`.
+                  Filho em `absolute` não soma altura, então a pilha
+                  dependia de um `min-h` chutado — e a parada 4, que tem
+                  o botão a mais, estourava esse valor e ia parar por
+                  cima da barra de percurso no celular.
+                  Com todos os filhos na MESMA célula (`grid-area:1/1`),
+                  a linha cresce sozinha até a parada mais alta. Sem
+                  número mágico, e sem como estourar quando um texto
+                  crescer. */}
+              <div className="grid">
                 {c.estacoes.map((e, i) => {
                   const ativa = estacao === i;
                   const passou = i < estacao;
@@ -206,7 +215,7 @@ export function Sala() {
                          Tab: sem ele, o botão da última parada continua
                          recebendo foco invisível. */
                       inert={!ativa}
-                      className="absolute inset-x-0 top-0 motion-reduce:transition-none"
+                      className="[grid-area:1/1] self-start motion-reduce:transition-none"
                       style={{
                         opacity: ativa ? 1 : 0,
                         translate: ativa ? "0 0" : passou ? "0 32px" : "0 -32px",
@@ -260,7 +269,7 @@ export function Sala() {
               {/* marcador de percurso: quantas paradas faltam */}
               <ol
                 ref={barraRef}
-                className="mt-2 flex gap-2"
+                className="mt-7 flex gap-2 lg:mt-2"
                 aria-label="Progresso do percurso"
               >
                 {c.estacoes.map((e, i) => (
