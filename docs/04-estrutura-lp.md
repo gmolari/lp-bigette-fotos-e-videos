@@ -63,11 +63,13 @@ decidindo o escopo, não depois.
 
 ## Trocar os placeholders por fotos reais
 
-1. Coloque as fotos em `public/portfolio/` como `01.jpg` … `07.jpg`
-2. Abra `src/components/sections/Sala.tsx` — **o código do `<Image>` já está
-   comentado lá dentro**, é só descomentar
-3. Mesma coisa para `Hero.tsx`, `Video.tsx` e `Sobre.tsx`
-4. As texturas dos prints da cena 3D também trocam: ver `docs/09-movimento-3d.md`
+**Banner, cordel e polaroides:** pelo painel. Envie em `/pictures` (banco de
+imagens, spec 005) e atrele a cada seção em `/sections` (spec 006), onde também
+se ordena. Seção vazia ou com menos de 4 fotos é completada com as provisórias.
+
+**Vídeo e "sobre"** também pelo painel, em `/sections` (spec 007): a foto da Bigette,
+e o vídeo por link do YouTube, com capa. Vazios, mostram o espaço reservado — nunca
+um rosto qualquer.
 
 ⚠️ **Os `alt` já estão escritos em `content.ts`. Não apague** — é o que faz as
 fotos aparecerem no Google Imagens.

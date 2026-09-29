@@ -8,6 +8,7 @@ import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 import { Reveal } from "@/components/ui/Reveal";
 import { Palco3D } from "@/components/three/Palco3D";
 import { content } from "@/config/content";
+import type { FotoPortfolio } from "@/lib/portfolio-tipos";
 import {
   MS_ENTRADA_PARADA,
   MS_DERIVA_PARADA,
@@ -29,7 +30,7 @@ const semInscricao = () => () => {};
  * Em aparelho sem 3D, cai numa grade normal com as mesmas fotos. O
  * conteúdo é o mesmo nos dois caminhos; o que muda é como se chega nele.
  */
-export function Sala() {
+export function Sala({ fotos }: { fotos: FotoPortfolio[] }) {
   const c = content.sala;
   const trilho = useRef<HTMLDivElement>(null);
   const barraRef = useRef<HTMLOListElement>(null);
@@ -85,7 +86,7 @@ export function Sala() {
               A grade de 2 colunas só fecha enquanto o número de
               retratos for par. */}
           <div className="mt-12 grid grid-cols-2 gap-3.5 [grid-auto-flow:dense] lg:block lg:columns-3">
-            {c.fotos.map((foto, i) => {
+            {fotos.map((foto, i) => {
               const deitada = foto.formato === "paisagem";
               return (
                 <Reveal
@@ -134,6 +135,7 @@ export function Sala() {
         <div className="sticky top-0 h-[100svh] overflow-hidden">
           <Palco3D
             tipo="varal"
+            fotos={fotos}
             refTrilho={trilho}
             aoTrocarEstacao={setEstacao}
             aoProgredir={aoProgredir}

@@ -8,6 +8,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { content } from "@/config/content";
 import { site } from "@/config/site";
 import { damp, semMovimento } from "@/lib/motion";
+import type { FotoPortfolio } from "@/lib/portfolio-tipos";
 
 /**
  * O HERO
@@ -32,7 +33,7 @@ import { damp, semMovimento } from "@/lib/motion";
  * Tudo escreve em custom properties do DOM a partir de UM laço de rAF.
  * Passar isso por estado do React seria um render por quadro de scroll.
  */
-export function Hero() {
+export function Hero({ foto }: { foto: FotoPortfolio }) {
   const raizRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -111,8 +112,8 @@ export function Hero() {
             {/* 🟡 /public/hero.jpg é PROVISÓRIA (Unsplash).
                 Ver public/portfolio/CREDITOS.txt. */}
             <Image
-              src={content.hero.foto}
-              alt={content.hero.fotoAlt}
+              src={foto.src}
+              alt={foto.alt}
               fill
               priority
               sizes="100vw"

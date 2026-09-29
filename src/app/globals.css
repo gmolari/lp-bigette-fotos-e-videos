@@ -60,6 +60,11 @@
   --color-wpp: #25d366;
   --color-wpp-ink: #06301a;
 
+  /* Feedback (painel). Contraste em docs/08-paleta.md — AAA nos 3 fundos */
+  --color-erro: #f2877b;
+  --color-erro-ink: #2a0a06;
+  --color-sucesso: #7fd6a4;
+
   /* ---------- TIPOGRAFIA ----------
      Fraunces no display (eixos SOFT/WONK: as terminações saem de
      propósito levemente tortas) e Instrument Sans no corpo.
@@ -221,6 +226,70 @@
     outline: 2px solid var(--color-accent-2);
     outline-offset: 3px;
     border-radius: 4px;
+  }
+
+  /* O Tailwind v4 deixa <button> com cursor padrão. Tudo que é clicável
+     ganha a mãozinha; desabilitado não. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  select:not(:disabled),
+  summary,
+  label[for],
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/* ── PAINEL: controle de formulário ────────────────────────────────
+   O foco mora no CONTORNO do controle (:focus-within), não no <input>:
+   borda acende, fundo sobe um degrau e um halo difuso aparece. O
+   outline global de :focus-visible é desligado só aqui dentro — ele é
+   ótimo para link e botão, e feio colado num campo de texto.
+   Spec: .claude/design-system/components.md → Field */
+@layer components {
+  .field-control {
+    --halo: color-mix(in oklab, var(--color-accent) 16%, transparent);
+    --glow: color-mix(in oklab, var(--color-accent) 30%, transparent);
+    display: flex;
+    align-items: center;
+    height: 2.75rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.75rem;
+    background: color-mix(in oklab, var(--color-bg) 70%, transparent);
+    transition:
+      border-color 0.2s var(--ease-out),
+      background-color 0.2s var(--ease-out),
+      box-shadow 0.3s var(--ease-out);
+  }
+  .field-control:hover {
+    border-color: var(--color-line-forte);
+  }
+  .field-control:focus-within {
+    border-color: color-mix(in oklab, var(--color-accent) 75%, transparent);
+    background: var(--color-bg-2);
+    box-shadow:
+      0 0 0 4px var(--halo),
+      0 12px 32px -14px var(--glow);
+  }
+  .field-control[data-invalid="true"] {
+    --halo: color-mix(in oklab, var(--color-erro) 14%, transparent);
+    --glow: color-mix(in oklab, var(--color-erro) 26%, transparent);
+    border-color: color-mix(in oklab, var(--color-erro) 80%, transparent);
+  }
+  .field-control[data-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .field-control :is(input, select, textarea):focus-visible {
+    outline: none;
+  }
+  /* Autocompletar do Chrome pinta o fundo de branco/amarelo por cima do
+     tema. A transição de "um século" congela o fundo transparente. */
+  .field-control input:-webkit-autofill {
+    -webkit-text-fill-color: var(--color-cream);
+    caret-color: var(--color-cream);
+    transition: background-color 600000s 0s;
   }
 }
 

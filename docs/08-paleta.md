@@ -96,8 +96,13 @@ Todos os pares em uso na página. Alvo mínimo AA (4,5:1).
 | tinta sobre botão lilás | `#180d32` / `#ac95fa` | **7,38:1** AAA |
 | tinta sobre ouro | `#221600` / `#e6b13f` | **9,07:1** AAA |
 | tinta sobre WhatsApp | `#06301A` / `#25D366` | **7,33:1** AAA |
+| erro sobre fundo | `#f2877b` / `#0a0911` | **8,04:1** AAA |
+| erro sobre cartão | `#f2877b` / `#22202f` | **6,48:1** AA |
+| tinta sobre erro | `#2a0a06` / `#f2877b` | **7,45:1** AAA |
+| sucesso sobre cartão | `#7fd6a4` / `#22202f` | **9,16:1** AAA |
 
-**13 de 13 passam. 12 em AAA.**
+**17 de 17 passam. 15 em AAA.** Erro e sucesso entraram em 26/09/2026 para o
+painel (`.claude/design-system/`); a página pública não os usa.
 
 ## Tipografia
 

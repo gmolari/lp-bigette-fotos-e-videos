@@ -7,6 +7,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { Palco3D } from "@/components/three/Palco3D";
 import { content } from "@/config/content";
 import { site } from "@/config/site";
+import type { FotoPortfolio } from "@/lib/portfolio-tipos";
 
 /**
  * O fecho. Atrás do texto, um carrossel lento de polaroides reveladas —
@@ -15,7 +16,7 @@ import { site } from "@/config/site";
  *
  * Sem 3D, a seção continua inteira: só perde o fundo.
  */
-export function CtaFinal() {
+export function CtaFinal({ fotos }: { fotos: FotoPortfolio[] }) {
   const c = content.final;
   const trilho = useRef<HTMLElement>(null);
 
@@ -34,7 +35,7 @@ export function CtaFinal() {
          embaixo sempre que a barra estivesse visível. */
       className="relative z-1 flex min-h-svh items-center overflow-hidden bg-bg py-24 text-center sm:block sm:min-h-0 sm:py-[132px]"
     >
-      <Palco3D tipo="polaroides" refTrilho={trilho} />
+      <Palco3D tipo="polaroides" fotos={fotos} refTrilho={trilho} />
 
       {/* véu radial discreto: abre no centro, onde fica o texto */}
       <span
