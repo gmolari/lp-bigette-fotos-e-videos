@@ -1,0 +1,117 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start All",
+      "detail": "Roda Claude + Run + Terminal juntos. Dispara automaticamente ao abrir o projeto.",
+      "dependsOn": ["Claude", "Run", "Terminal"],
+      "dependsOrder": "parallel",
+      "icon": {
+        "id": "run-all",
+        "color": "terminal.ansiCyan"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Claude",
+      "detail": "Inicia o Claude Code nesta pasta",
+      "type": "shell",
+      "command": "claude",
+      "icon": {
+        "id": "claude",
+        "color": "terminal.ansiYellow"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true,
+        "echo": false,
+        "clear": false,
+        "showReuseMessage": false
+      },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Run",
+      "detail": "Sobe o dev server do Next (npm run dev) em http://localhost:3000",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "icon": {
+        "id": "vm-running",
+        "color": "terminal.ansiGreen"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false,
+        "echo": false,
+        "clear": false,
+        "showReuseMessage": false
+      },
+      "isBackground": true,
+      // Sem os padrões de início/fim o VS Code não sabe quando um task de
+      // fundo "ficou pronto" e reclama que não consegue rastreá-lo.
+      // Casam com a saída do Next 16:
+      //   ▲ Next.js 16.3.1 (Turbopack)
+      //   ✓ Ready in 208ms
+      "problemMatcher": {
+        "owner": "nextjs",
+        "source": "next",
+        "fileLocation": ["relative", "${workspaceFolder}"],
+        // Erro de compilação do Next vem em duas linhas:
+        //   ⨯ ./src/app/page.tsx:12:3
+        //   Error: Expected '>', got '}'
+        "pattern": [
+          {
+            "regexp": "^\\S*\\s*\\./(src/[^:\\s]+):(\\d+):(\\d+)\\s*$",
+            "file": 1,
+            "line": 2,
+            "column": 3
+          },
+          {
+            "regexp": "^\\s*(.+)$",
+            "message": 1
+          }
+        ],
+        "background": {
+          "activeBegins": true,
+          "beginsPattern": "Next\\.js \\d+",
+          "endsPattern": "(Ready in|Local:\\s+http)"
+        }
+      }
+    },
+    {
+      "label": "Terminal",
+      "detail": "Abre um terminal padrao na pasta do projeto",
+      "type": "process",
+      // O shell padrão de CADA máquina, não um caminho fixo: o arquivo vai
+      // no repositório e roda ao abrir a pasta em qualquer PC. Linux/Mac:
+      // $SHELL (aqui, o fish). Windows: PowerShell.
+      "command": "${env:SHELL}",
+      "windows": {
+        "command": "powershell.exe"
+      },
+      "icon": {
+        "id": "terminal",
+        "color": "terminal.ansiBlue"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false,
+        "echo": false,
+        "clear": false,
+        "showReuseMessage": false
+      },
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}
