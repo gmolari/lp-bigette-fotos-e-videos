@@ -58,7 +58,36 @@ npm run dev      # http://localhost:3000
 npm run build
 npm run start
 npm run lint
+npm run db:generate   # migration a partir do schema
+npm run db:migrate    # ⚠️ aplica em PRODUÇÃO — não há homologação
+npm run db:studio
+npm run user:create -- <email> <username> [--admin] [--name "Nome"]   # 1º admin / trocar senha
 ```
+
+## Backend — banco de dados
+
+Supabase (Postgres) + Drizzle ORM + postgres.js + zod + React Query, em módulos DDD.
+**Leia antes de mexer:**
+- `.claude/architecture/README.md` — estrutura, regras de dependência, receita de feature
+- `.claude/specs/` — uma spec por entrega, numeradas
+- `.claude/design-system/` — tokens, componentes, estados e movimento (painel)
+
+Regras que não se negociam:
+- **Cliente → back só por server action**, criada com `createAction({ name, input, guard })`
+  (`src/server/action.ts`) e consumida com `useAction` / `useActionQuery` / `useActionForm`.
+  Nada de route handler para dado próprio.
+- **Erro de action na tela só via `<ActionAlert>`.** Códigos e mensagens: spec 004.
+- **Mexeu em schema/migration com `npm run dev` aberto? Reinicie o dev.** O Turbopack
+  guarda o schema antigo e o erro que sai não aponta para isso (spec 004).
+- **Identificadores, arquivos e pastas em inglês.** Comentários podem ser PT-BR.
+  (O código legado da LP — `Gatilho`, `content.sala`… — segue em PT até alguém pedir o contrário.)
+- **Toda tabela nova em `public` leva `.enableRLS()`** — senão a chave `anon` do Supabase lê a tabela.
+- **Painel escondido:** `/login`, `/pictures`, `/profile`, `/sections`, `/users` só existem via
+  `/login?access=<PANEL_ACCESS_KEY>`. Nunca listar no sitemap nem no robots.txt.
+  Rota nova do painel → adicionar ao `matcher` de `src/proxy.ts`.
+- **Papéis:** `admin` (tudo, inclusive `/users`) e `member`. Sessão é conferida NO BANCO
+  a cada requisição; o proxy só vê o JWT e por isso **nunca redireciona para dentro**.
+- Texto do painel em `src/config/panel-content.ts` (fora do pacote da LP), não em `content.ts`.
 
 ## Arquitetura
 
@@ -79,6 +108,13 @@ src/
 │   ├── jsonld.ts             LocalBusiness, FAQPage, Person, WebSite, Breadcrumb
 │   ├── whatsapp.ts           montagem dos links + rastreio por seção
 │   └── tokens.ts             {CIDADE} {PRAZO} {RAIO}
+├── app/(panel)/            painel escondido: login + (area)/pictures (banco) | sections (onde cada foto aparece) | profile
+├── lib/portfolio.ts        fotos de cada seção lidas NO SERVIDOR (cache por tag) → Hero/Sala/CtaFinal/cena 3D
+├── proxy.ts                portão do painel (404 sem o link) + checagem de sessão
+├── modules/<module>/       DDD: domain · application · infrastructure · actions.ts · index.ts
+├── server/                 env.ts · action.ts (fábrica) · auth/ (JWT) · panel/ (portão) · db/
+├── lib/action · lib/form   Result, hooks React Query, useActionForm
+├── components/panel/       UI do painel: ui/ (Button, Field, Alert…) · motion/tokens.ts
 └── components/
     ├── sections/             11 seções + TopBar/Footer/WhatsAppFloat
     ├── ui/                   Gatilho, WhatsAppButton, Section, Placeholder
@@ -102,8 +138,14 @@ Ao adicionar uma seção nova, ela precisa de um gatilho. É o padrão do projet
 ✅ Cena 3D em duas seções, **inclusive no celular**, com enquadramento
    próprio em retrato e o chunk (130 KB) baixado só perto da seção.
    O portão de 900px caiu — ver `docs/09-movimento-3d.md`
-🟡 **Fotos do portfólio e hero são do Unsplash, provisórias** — `public/portfolio/CREDITOS.txt`.
-   O `<Image>` já está ligado em `Sala.tsx` e `Hero.tsx`; `Video.tsx` e `Sobre.tsx` seguem em placeholder
+✅ **Fotos: banco de imagens em `/pictures` (Vercel Blob privado), spec 005.**
+✅ **Seções em `/sections`: banner (1), cordel (7) e polaroides (12), spec 006.**
+   Repetição só a partir de 4; abaixo disso completa com as provisórias.
+✅ **Sobre (1 foto) e Vídeo (link do YouTube + capa), spec 007** — inventário de toda
+   mídia da página com proporções. Migration `0005` aplicada em 29/09/2026.
+   ⛔ Imgur foi descartado: fechou o registro de apps novos (ver spec 005).
+   Seção vazia → a LP mostra as provisórias do Unsplash (`public/portfolio/CREDITOS.txt`).
+   Sobre e Vídeo vazios → espaço reservado (nunca um rosto qualquer).
 🔴 **Os 4 depoimentos são inventados e dois foram copiados de concorrente.**
    Marcado em `content.ts`. Não subir a página com eles.
 🟡 `serviceRadiusKm` (50 km) e `prazoEntregaDias` (10) são suposições — confirmar

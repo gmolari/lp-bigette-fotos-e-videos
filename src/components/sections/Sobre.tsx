@@ -1,16 +1,28 @@
+import Image from "next/image";
 import { Section, Eyebrow, Title, Lead } from "@/components/ui/Section";
 import { Gatilho } from "@/components/ui/Gatilho";
 import { Placeholder } from "@/components/ui/Placeholder";
 import { Reveal } from "@/components/ui/Reveal";
 import { content } from "@/config/content";
+import type { FotoPortfolio } from "@/lib/portfolio-tipos";
 
-export function Sobre() {
+/**
+ * A foto vem do painel (/sections → Sobre). Sem ela, espaço reservado —
+ * nunca um rosto qualquer no lugar do dela (docs/06-pendencias.md).
+ */
+export function Sobre({ foto }: { foto: FotoPortfolio | null }) {
   const c = content.sobre;
   return (
     <Section id="sobre" alt>
       <div className="grid items-center gap-9 md:grid-cols-2 md:gap-14">
         <Reveal variante="foco">
-          <Placeholder label="Foto da Bigette" ratio="aspect-square" />
+          {foto ? (
+            <div className="relative aspect-square overflow-hidden rounded-[16px] bg-bg-2">
+              <Image src={foto.src} alt={foto.alt} fill sizes="(max-width:768px) 100vw, 50vw" className="object-cover" />
+            </div>
+          ) : (
+            <Placeholder label={c.reservado} ratio="aspect-square" />
+          )}
         </Reveal>
         <div>
           <Eyebrow>{c.eyebrow}</Eyebrow>

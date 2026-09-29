@@ -11,22 +11,37 @@ import { Faq } from "@/components/sections/Faq";
 import { CtaFinal } from "@/components/sections/CtaFinal";
 import { Footer } from "@/components/sections/Footer";
 import { WhatsAppFloat } from "@/components/sections/WhatsAppFloat";
+import { fotosDasSecoes } from "@/lib/portfolio";
 
-export default function Home() {
+/**
+ * Rede de segurança do cache das fotos. O normal é a action do painel
+ * invalidar a tag na hora; isto cobre o build que caiu nas fotos de
+ * reserva porque o banco estava fora do ar — sem ele, a página ficaria
+ * presa nelas até o próximo deploy. No máximo uma consulta por hora, e
+ * só se alguém visitar.
+ */
+export const revalidate = 3600;
+
+export default async function Home() {
+  // Lidas no servidor, com cache (ver src/lib/portfolio.ts): as URLs já
+  // saem no HTML e a página continua estática. Cada seção tem as suas
+  // fotos, escolhidas em /sections no painel.
+  const fotos = await fotosDasSecoes();
+
   return (
     <>
       <TopBar />
       <main id="conteudo" className="relative z-1">
-        <Hero />
+        <Hero foto={fotos.hero} />
         <FaixaImpacto />
         <Experiencia />
-        <Sala />
+        <Sala fotos={fotos.portfolio} />
         <Depoimentos />
-        <Video />
+        <Video video={fotos.video} capa={fotos.capaSemVideo} />
         <ComoFunciona />
-        <Sobre />
+        <Sobre foto={fotos.about} />
         <Faq />
-        <CtaFinal />
+        <CtaFinal fotos={fotos.closing} />
       </main>
       <Footer />
       <WhatsAppFloat />

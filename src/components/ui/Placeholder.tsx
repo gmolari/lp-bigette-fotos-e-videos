@@ -1,9 +1,9 @@
 import { ImageIcon } from "lucide-react";
 
 /**
- * Bloco visual usado enquanto as fotos reais não entram.
- * Troque por <Image /> do next/image assim que as fotos chegarem
- * em /public/portfolio/.
+ * Espaço reservado das seções SEM foto provisória (Sobre, Vídeo): aparece
+ * enquanto o painel (/sections) não tiver foto para elas. Onde existe
+ * provisória (banner, cordel, polaroides), ela é usada no lugar disto.
  */
 export function Placeholder({
   label,

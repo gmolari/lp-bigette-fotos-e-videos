@@ -23,28 +23,13 @@
  */
 import * as THREE from "three";
 import { MS_ENTRADA_PARADA, clamp, damp, lerp } from "@/lib/motion";
-import { content } from "@/config/content";
+import type { FotoPortfolio } from "@/lib/portfolio-tipos";
 
-/** As mesmas fotos do portfólio alimentam as duas cenas. */
-const FOTOS = content.sala.fotos.map((f) => f.src);
-/** Em pé ou deitada — decide o formato do papel pendurado. */
-const DEITADA = content.sala.fotos.map((f) => f.formato === "paisagem");
-
-/**
- * As fotos reais já foram entregues?
- *
- * Uma única requisição HEAD na primeira, memorizada. Sem isso seriam 19
- * erros 404 no console toda vez que a página abre enquanto o portfólio
- * não chega — e um console cheio de erro inofensivo é a melhor forma de
- * esconder o erro que importa.
+/*
+ * As fotos chegam por parâmetro, as mesmas nas duas cenas. Vêm do
+ * servidor já resolvidas (banco → Vercel Blob, ou as de reserva do
+ * content.ts), então não há mais sonda HEAD para descobrir se existem.
  */
-let _temFotos: Promise<boolean> | null = null;
-function fotosEntregues(): Promise<boolean> {
-  _temFotos ??= fetch(FOTOS[0], { method: "HEAD" })
-    .then((r) => r.ok)
-    .catch(() => false);
-  return _temFotos;
-}
 
 /**
  * A textura de um print é desenhada num canvas de 300×375. O JPEG
@@ -121,7 +106,7 @@ export type Palco = {
  * Com `foto`, a imagem real é composta dentro da margem. Sem ela, o
  * miolo é um gradiente com realce — a cena não finge ter portfólio que
  * ainda não existe, mesma postura do <Placeholder> do resto da página.
- * Basta pôr os arquivos em public/portfolio/ que a troca é automática.
+ * A troca acontece sozinha quando a foto termina de baixar.
  */
 function texturaDePrint(
   i: number,
@@ -293,7 +278,7 @@ const LARGURA_LARGA = 900;
  */
 const ZONA_MORTA = 0.62;
 
-export function criarVaral(canvas: HTMLCanvasElement): Palco {
+export function criarVaral(canvas: HTMLCanvasElement, fotos: FotoPortfolio[]): Palco {
   const renderer = montarRenderer(canvas);
   const cena = new THREE.Scene();
   cena.fog = new THREE.FogExp2(COR.fundo, 0.042);
@@ -359,7 +344,8 @@ export function criarVaral(canvas: HTMLCanvasElement): Palco {
     lixo.push(tex, mat);
     materiaisPrint.push(mat);
 
-    const deitada = DEITADA[i % DEITADA.length];
+    // Com menos de 7 fotos o varal repete; com mais, pendura as 7 primeiras da ordem
+    const deitada = fotos[i % fotos.length]?.formato === "paisagem";
     const print = new THREE.Mesh(deitada ? geoPaisagem : geoRetrato, mat);
     // pendura pelo topo: o papel deitado desce menos que o em pé
     print.position.y = deitada ? -0.84 : -1.05;
@@ -545,9 +531,9 @@ export function criarVaral(canvas: HTMLCanvasElement): Palco {
   }
 
   redimensionar();
-  // Assim que as fotos existirem em public/portfolio/, os prints deixam
-  // de ser desenho e passam a ser o trabalho dela.
-  void aplicarFotosReais(materiaisPrint, texturaDePrint, lixo, () => !destruido);
+  // Os prints nascem desenhados e viram o trabalho dela assim que cada
+  // foto chega.
+  void aplicarFotosReais(materiaisPrint, fotos, texturaDePrint, lixo, () => !destruido);
   return palco;
 }
 
@@ -595,23 +581,24 @@ function texturaDePolaroide(
 }
 
 /**
- * Troca as texturas procedurais pelas fotos reais, se elas existirem.
+ * Troca as texturas procedurais pelas fotos reais.
  *
  * A cena aparece na hora com o desenho procedural e faz o upgrade
  * depois — ninguém espera download para ver a página se mexer.
  */
 async function aplicarFotosReais(
   materiais: THREE.MeshStandardMaterial[],
+  fotos: FotoPortfolio[],
   fazerTextura: (i: number, foto: HTMLImageElement) => THREE.CanvasTexture,
   lixo: Array<{ dispose: () => void }>,
   aindaVivo: () => boolean,
 ) {
-  if (!(await fotosEntregues()) || !aindaVivo()) return;
+  if (fotos.length === 0) return;
 
   await Promise.all(
     materiais.map(async (mat, i) => {
       const foto = await carregarImagem(
-        urlOtimizada(FOTOS[i % FOTOS.length]),
+        urlOtimizada(fotos[i % fotos.length].src),
       );
       if (!foto || !aindaVivo()) return;
       const nova = fazerTextura(i, foto);
@@ -623,7 +610,7 @@ async function aplicarFotosReais(
   );
 }
 
-export function criarPolaroides(canvas: HTMLCanvasElement): Palco {
+export function criarPolaroides(canvas: HTMLCanvasElement, fotos: FotoPortfolio[]): Palco {
   const renderer = montarRenderer(canvas);
   const cena = new THREE.Scene();
   cena.fog = new THREE.FogExp2(COR.fundo, 0.055);
@@ -708,7 +695,7 @@ export function criarPolaroides(canvas: HTMLCanvasElement): Palco {
   }
 
   redimensionar();
-  void aplicarFotosReais(materiais, texturaDePolaroide, lixo, () => !destruido);
+  void aplicarFotosReais(materiais, fotos, texturaDePolaroide, lixo, () => !destruido);
   return {
     setProgresso: (p) => {
       progresso = clamp(p);

@@ -27,11 +27,33 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
 
+  experimental: {
+    serverActions: {
+      /**
+       * O upload de foto passa inteiro por uma server action, e o padrão
+       * é 1 MB. A foto pode ter até 4 MB (MAX_PICTURE_BYTES, em
+       * modules/pictures/domain/picture.ts) + a sobra do multipart.
+       * Não suba além de 4,5 MB: é onde a Vercel corta o corpo da
+       * função, e o erro de lá não chega a ser uma resposta da action.
+       */
+      bodySizeLimit: "4.5mb",
+    },
+  },
+
   images: {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [360, 480, 640, 828, 1080, 1200, 1920],
     imageSizes: [64, 128, 256, 384],
     minimumCacheTTL: 60 * 60 * 24 * 30,
+    /**
+     * As fotos do portfólio moram num Vercel Blob PRIVADO e chegam pela
+     * rota /media/… do próprio site — caminho local, então o otimizador
+     * aceita sem `remotePatterns`.
+     *
+     * O único host de fora: a miniatura do YouTube, usada como capa do
+     * vídeo quando o painel não tem uma (spec 007). Só `/vi/`.
+     */
+    remotePatterns: [{ protocol: "https", hostname: "i.ytimg.com", pathname: "/vi/**" }],
   },
 
   async headers() {

@@ -11,7 +11,10 @@ export const content = {
       "Não é uma sessão de fotos. É o dia em que você para tudo, olha pra câmera e descobre que sempre esteve bonita — só faltava alguém enxergar.",
     cta: "Quero garantir minha data",
     selo: "Atendo poucas sessões por mês para não entregar nada correndo.",
-    /** A foto mais forte do portfólio — /public/hero.jpg. Hoje provisória. */
+    /**
+     * Foto PROVISÓRIA do banner — usada só enquanto a seção "hero" do
+     * painel (/sections) estiver vazia.
+     */
     foto: "/hero.jpg",
     fotoAlt:
       "Noiva segurando o buquê, iluminada por trás pelo sol do fim da tarde",
@@ -169,6 +172,10 @@ export const content = {
       frase: "Foto você vai ter. Vídeo, só se você pedir.",
       cta: "Quero foto e vídeo",
     },
+    /** Enquanto não houver vídeo nem capa no painel (/sections → Vídeo). */
+    reservado: "Frame do vídeo ou reel em loop",
+    /** Rótulo do botão de play (leitor de tela). O título do vídeo vem depois. */
+    assistir: "Assistir ao vídeo",
   },
 
   comoFunciona: {
@@ -217,6 +224,8 @@ export const content = {
       frase: "Me conta o que você quer registrar. Eu adoro essa parte.",
       cta: "Contar pra Bigette",
     },
+    /** Enquanto não houver foto no painel (/sections → Sobre). Nunca um rosto qualquer. */
+    reservado: "Foto da Bigette",
   },
 
   faq: {

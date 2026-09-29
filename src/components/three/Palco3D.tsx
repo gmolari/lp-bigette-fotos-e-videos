@@ -2,10 +2,13 @@
 
 import { useEffect, useRef, useSyncExternalStore, type RefObject } from "react";
 import type { Palco } from "./cenas";
+import type { FotoPortfolio } from "@/lib/portfolio-tipos";
 import { aguentaCena3D, progressoDoElemento } from "@/lib/motion";
 
 type Props = {
   tipo: "varal" | "polaroides";
+  /** Vêm do servidor, já no HTML. Viram as texturas dos prints/polaroides. */
+  fotos: FotoPortfolio[];
   /** elemento cujo avanço pela tela dirige a cena */
   refTrilho: RefObject<HTMLElement | null>;
   aoTrocarEstacao?: (i: number) => void;
@@ -24,7 +27,7 @@ type Props = {
  */
 const semInscricao = () => () => {};
 
-export function Palco3D({ tipo, refTrilho, aoTrocarEstacao, aoProgredir, className = "" }: Props) {
+export function Palco3D({ tipo, fotos, refTrilho, aoTrocarEstacao, aoProgredir, className = "" }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // Sem suporte, nem o <canvas> vazio entra no DOM.
   const tem3D = useSyncExternalStore(semInscricao, aguentaCena3D, () => false);
@@ -67,7 +70,7 @@ export function Palco3D({ tipo, refTrilho, aoTrocarEstacao, aoProgredir, classNa
     const iniciar = async () => {
       const mod = await import("./cenas");
       if (!vivo) return;
-      palco = tipo === "varal" ? mod.criarVaral(canvas) : mod.criarPolaroides(canvas);
+      palco = tipo === "varal" ? mod.criarVaral(canvas, fotos) : mod.criarPolaroides(canvas, fotos);
       palco.aoTrocarEstacao = (i) => cbRef.current?.(i);
       palco.aoProgredir = (p) => progRef.current?.(p);
       palco.setProgresso(progressoDoElemento(trilho));
@@ -119,7 +122,7 @@ export function Palco3D({ tipo, refTrilho, aoTrocarEstacao, aoProgredir, classNa
       obs?.disconnect();
       palco?.destruir();
     };
-  }, [tipo, refTrilho, tem3D]);
+  }, [tipo, fotos, refTrilho, tem3D]);
 
   if (!tem3D) return null;
 

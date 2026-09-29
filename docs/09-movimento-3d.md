@@ -197,25 +197,34 @@ do `useEffect`** — sem isso o efeito roda uma vez só, quando o `<canvas>`
 ainda nem está no DOM, e a cena nunca é criada. Aconteceu; as polaroides
 sumiram sem erro nenhum no console.
 
-## As fotos reais entram sozinhas
+## As fotos reais entram pelo painel
 
-Basta pôr `01.jpg` … `07.jpg` em `public/portfolio/`. As duas cenas passam a
-usá-las — nos prints do varal e nas polaroides do fecho — sem tocar em código.
+🔄 Desde 29/09/2026 cada cena tem as suas fotos, escolhidas em `/sections`
+no painel — **spec 006** (o upload é a spec 005). `page.tsx` as lê no
+servidor e passa por prop até `criarVaral(canvas, fotos)` /
+`criarPolaroides(canvas, fotos)`. Seção vazia → `content.sala.fotos`.
+
+**Repetição só a partir de 4 fotos.** Com 1 a 3, as da seção entram uma vez
+cada e o resto dos 7 prints / 12 polaroides é completado com as provisórias —
+o servidor já manda a lista pronta, e o `i % n` de `cenas.ts` não chega a
+repetir nada. ⚠️ Se `N` (7) ou `QTD` (12) mudarem, mude `SECTION_RULES` junto.
 
 Como funciona: a cena nasce com as texturas desenhadas em `<canvas>` e
-aparece **na hora**; em paralelo, `aplicarFotosReais()` verifica se as fotos
-existem e faz o upgrade. Ninguém espera download para ver a página se mexer.
+aparece **na hora**; em paralelo, `aplicarFotosReais()` baixa cada foto
+(via `/_next/image`, 384 px) e faz o upgrade. Ninguém espera download para
+ver a página se mexer.
 
-A verificação é **uma** requisição `HEAD` em `01.jpg`, memorizada. Enquanto as
-fotos não chegam, isso deixa **um** 404 no console — sem a sonda seriam 19
-tentativas falhando a cada carregamento, e console cheio de erro inofensivo é
-a melhor forma de esconder o erro que importa.
+A antiga sonda `HEAD` em `01.jpg` **saiu**: ela existia para descobrir se as
+fotos tinham sido entregues. Agora o servidor já manda a lista resolvida.
+
+O varal tem **7 prints fixos**: com mais fotos, pendura as 7 primeiras da
+ordem da seção. A grade sem 3D mostra todas.
 
 A margem de papel continua desenhada; só o miolo vira a foto, com recorte
 `cover` centralizado. O grão de filme é aplicado **só** no procedural: numa
 foto de verdade ele sujaria a imagem.
 
-O campo `formato` de cada foto em `content.sala.fotos` faz três coisas ao
+O campo `formato` de cada foto (derivado de largura × altura no upload) faz três coisas ao
 mesmo tempo: define a proporção na grade 2D, quais ocupam duas colunas, e o
 **formato do papel pendurado no varal 3D**. Um varal só de retrato fica com
 cara de catálogo — misturar em pé e deitada é o que faz parecer trabalho.
