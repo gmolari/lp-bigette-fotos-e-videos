@@ -5,6 +5,7 @@ import type { Picture } from "@/modules/pictures/domain/picture";
 import { getPublishedSections } from "@/modules/sections";
 import { SECTION_RULES, resolveSection } from "@/modules/sections/domain/section";
 import { youTubeThumbnail } from "@/modules/sections/domain/video";
+import { describeCause } from "@/server/errors";
 
 export type FotosDasSecoes = {
   /** A foto de fundo do banner. */
@@ -49,7 +50,9 @@ export async function fotosDasSecoes(): Promise<FotosDasSecoes> {
   try {
     publicado = await getPublishedSections();
   } catch (e) {
-    console.warn(`[portfolio] banco indisponível, usando as fotos provisórias: ${String(e)}`);
+    // `String(e)` de um erro do Drizzle é só "Failed query: <sql>" — o motivo
+    // de verdade (rede, senha, projeto pausado) mora na causa.
+    console.warn(`[portfolio] seções não lidas, usando as fotos provisórias — causa: ${describeCause(e)}`);
   }
 
   const s = publicado?.sections;
