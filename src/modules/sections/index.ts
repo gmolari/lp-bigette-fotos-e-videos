@@ -2,7 +2,7 @@ import "server-only";
 import { unstable_cache } from "next/cache";
 import { getDb } from "@/server/db/client";
 import { PICTURES_CACHE_TAG } from "../pictures/cache";
-import { getPublished } from "./application/sections";
+import { getPublished, getPublishedTexts } from "./application/sections";
 import { drizzleSectionRepository } from "./infrastructure/repository";
 
 /** Fachada para Server Components. Actions ficam em `./actions`. */
@@ -20,5 +20,16 @@ import { drizzleSectionRepository } from "./infrastructure/repository";
 export const getPublishedSections = unstable_cache(
   async () => getPublished({ sections: drizzleSectionRepository(getDb()) }),
   ["sections:published"],
+  { tags: [PICTURES_CACHE_TAG] },
+);
+
+/**
+ * Os textos da página (padrão + personalizado no painel). Mesma tag das
+ * fotos: qualquer escrita em /sections invalida os dois. Em consulta
+ * separada para que uma falha aqui não derrube as fotos.
+ */
+export const getPublishedSectionTexts = unstable_cache(
+  async () => getPublishedTexts({ sections: drizzleSectionRepository(getDb()) }),
+  ["sections:texts"],
   { tags: [PICTURES_CACHE_TAG] },
 );

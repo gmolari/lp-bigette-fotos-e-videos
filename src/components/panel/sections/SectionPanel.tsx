@@ -57,12 +57,15 @@ export function SectionPanel({
   pictures,
   bank,
   video,
+  children,
 }: {
   sectionKey: SectionKey;
   pictures: Picture[];
   bank: BankPicture[];
   /** Só na seção "video". */
   video?: SectionVideo;
+  /** O editor de textos da seção, quando ela tem texto editável (spec 008). */
+  children?: React.ReactNode;
 }) {
   const queryClient = useQueryClient();
   const [picking, setPicking] = useState(false);
@@ -166,6 +169,8 @@ export function SectionPanel({
             </m.div>
           )}
         </AnimatePresence>
+
+        {children}
       </div>
     </section>
   );

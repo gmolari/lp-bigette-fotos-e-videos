@@ -46,6 +46,8 @@ Como o projeto chegou aqui: @docs/07-conversa-original.md
 - **Nunca desenhe um layout que você não observou.** Um artefato visual vira
   evidência aos olhos de quem o vê depois, por mais que haja ressalva escrita.
 - Texto e conteúdo **sempre** em `src/config/content.ts`. Nunca hardcode string em componente.
+  Parte dele é só o PADRÃO: 7 seções têm campos que o painel altera (`/sections`, spec 008).
+  Campo editável novo → esquema e padrão em `modules/sections/domain/texts.ts`.
 - Dados de negócio **sempre** em `src/config/site.ts`.
 - Todo CTA de WhatsApp passa por `<WhatsAppButton source="...">`. **Não altere os
   valores de `source`** — são a chave do relatório de conversão.
@@ -87,6 +89,9 @@ Regras que não se negociam:
   Rota nova do painel → adicionar ao `matcher` de `src/proxy.ts`.
 - **Papéis:** `admin` (tudo, inclusive `/users`) e `member`. Sessão é conferida NO BANCO
   a cada requisição; o proxy só vê o JWT e por isso **nunca redireciona para dentro**.
+- **Sessão = access JWT de 15 min + refresh opaco de 7 dias, de uso único** (spec 009). O proxy
+  renova; refresh já usado que reaparece revoga a sessão inteira. Cookie de sessão só por
+  `server/auth/cookies.ts`; nunca aumente o prazo do access para "resolver" um deslogamento.
 - Texto do painel em `src/config/panel-content.ts` (fora do pacote da LP), não em `content.ts`.
 
 ## Arquitetura
@@ -110,6 +115,7 @@ src/
 │   └── tokens.ts             {CIDADE} {PRAZO} {RAIO}
 ├── app/(panel)/            painel escondido: login + (area)/pictures (banco) | sections (onde cada foto aparece) | profile
 ├── lib/portfolio.ts        fotos de cada seção lidas NO SERVIDOR (cache por tag) → Hero/Sala/CtaFinal/cena 3D
+├── lib/page-texts.ts       textos editáveis lidos NO SERVIDOR (padrão de content.ts + painel) → 7 seções
 ├── proxy.ts                portão do painel (404 sem o link) + checagem de sessão
 ├── modules/<module>/       DDD: domain · application · infrastructure · actions.ts · index.ts
 ├── server/                 env.ts · action.ts (fábrica) · auth/ (JWT) · panel/ (portão) · db/
@@ -146,6 +152,12 @@ Ao adicionar uma seção nova, ela precisa de um gatilho. É o padrão do projet
    ⛔ Imgur foi descartado: fechou o registro de apps novos (ver spec 005).
    Seção vazia → a LP mostra as provisórias do Unsplash (`public/portfolio/CREDITOS.txt`).
    Sobre e Vídeo vazios → espaço reservado (nunca um rosto qualquer).
+✅ **Textos editáveis em `/sections`, spec 008** — Hero, Faixa, Experiência, Depoimentos,
+   Vídeo, Sobre e FAQ (campos escolhidos um a um). Padrão em `content.ts`; o banco guarda só
+   o personalizado. Migration `0006` aplicada em 13/10/2026. 🟡 Telas não vistas em navegador.
+✅ **Refresh token com rotação, spec 009** — access 15 min, refresh 7 dias (teto de 30),
+   logout revoga no banco. Migration `0007` aplicada em 13/10/2026. 🟡 Login/logout pelo
+   formulário ainda não testados; sem rate limit no login.
 🔴 **Os 4 depoimentos são inventados e dois foram copiados de concorrente.**
    Marcado em `content.ts`. Não subir a página com eles.
 🟡 `serviceRadiusKm` (50 km) e `prazoEntregaDias` (10) são suposições — confirmar

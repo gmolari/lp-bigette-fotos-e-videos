@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { check, index, integer, pgEnum, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { check, index, integer, jsonb, pgEnum, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { pictures } from "../../pictures/infrastructure/schema";
 
 /**
@@ -57,3 +57,22 @@ export const sectionVideos = pgTable(
   },
   (t) => [check("section_videos_youtube_id_format", sql`${t.youtubeId} ~ '^[A-Za-z0-9_-]{11}$'`)],
 ).enableRLS();
+
+/**
+ * Texto PERSONALIZADO de uma seção (spec 008). Uma linha por seção, com o
+ * conteúdo inteiro dela em JSON; sem linha, a página usa o padrão de
+ * `content.ts`. O formato é validado pelo zod (`domain/texts.ts`) na
+ * escrita E na leitura — o banco só guarda.
+ *
+ * `section` é texto, não o enum `page_section`: as seções com texto não
+ * são as mesmas que têm foto, e valor novo de enum custa uma migration
+ * que não pode ser usada na própria transação (spec 007).
+ */
+export const sectionTexts = pgTable("section_texts", {
+  section: text().primaryKey(),
+  content: jsonb().notNull(),
+  updatedAt: timestamp({ withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+}).enableRLS();

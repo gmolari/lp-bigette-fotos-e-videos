@@ -281,6 +281,10 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
+  .field-control[data-multiline="true"] {
+    height: auto;
+    align-items: stretch;
+  }
   .field-control :is(input, select, textarea):focus-visible {
     outline: none;
   }

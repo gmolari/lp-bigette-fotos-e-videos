@@ -110,9 +110,10 @@ entre itens (`spring.gentle`). Em tela estreita mostra só ícones.
 
 ## Especificados, ainda não implementados 📐
 
-### Textarea
-Mesmos estados do Field. Altura mínima 3 linhas, `resize-y`. Contador opcional
-(`hint` vira "120/500"; passa a `erro` ao estourar).
+### Textarea ✅ (implementado na spec 008 — `ui/Textarea.tsx`)
+Mesmos estados do Field. Altura mínima 3 linhas, `resize-y`. O contorno perde a altura
+fixa com `data-multiline` (prop `multiline` do `FieldShell`). Contador opcional
+(`hint` vira "120/500"; passa a `erro` ao estourar) — **ainda não feito**.
 
 ### Checkbox / Switch
 Alvo de toque 44 px mesmo com a caixa de 18 px (label clicável). Switch para

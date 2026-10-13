@@ -56,6 +56,7 @@ decidindo o escopo, não depois.
 | As 4 paradas do varal (frase, texto, foto) | `src/config/content.ts` → `sala.estacoes` |
 | A trajetória da câmera 3D | `src/components/three/cenas.ts` → `PARADAS` |
 | Qualquer texto, incluindo os gatilhos | `src/config/content.ts` |
+| Texto que o painel altera (7 seções) | painel → `/sections` → Textos. O `content.ts` é o padrão; quem está personalizado ignora o arquivo (spec 008) |
 | WhatsApp, cidade, prazo, raio, Instagram | `src/config/site.ts` |
 | Cores e tipografia | `src/app/globals.css` (bloco `@theme`) |
 | Ordem das seções | `src/app/page.tsx` |

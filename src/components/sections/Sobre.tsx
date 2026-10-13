@@ -5,12 +5,14 @@ import { Placeholder } from "@/components/ui/Placeholder";
 import { Reveal } from "@/components/ui/Reveal";
 import { content } from "@/config/content";
 import type { FotoPortfolio } from "@/lib/portfolio-tipos";
+import type { SectionTexts } from "@/modules/sections/domain/texts";
 
 /**
  * A foto vem do painel (/sections → Sobre). Sem ela, espaço reservado —
  * nunca um rosto qualquer no lugar do dela (docs/06-pendencias.md).
+ * Título e parágrafos também vêm de lá (`textos`).
  */
-export function Sobre({ foto }: { foto: FotoPortfolio | null }) {
+export function Sobre({ foto, textos }: { foto: FotoPortfolio | null; textos: SectionTexts["about"] }) {
   const c = content.sobre;
   return (
     <Section id="sobre" alt>
@@ -26,9 +28,9 @@ export function Sobre({ foto }: { foto: FotoPortfolio | null }) {
         </Reveal>
         <div>
           <Eyebrow>{c.eyebrow}</Eyebrow>
-          <Title>{c.title}</Title>
-          {c.paragrafos.map((p, i) => (
-            <Lead key={p} className="mb-4" delay={140 + i * 90}>
+          <Title>{textos.title}</Title>
+          {textos.paragraphs.map((p, i) => (
+            <Lead key={i} className="mb-4" delay={140 + i * 90}>
               {p}
             </Lead>
           ))}

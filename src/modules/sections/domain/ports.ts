@@ -1,5 +1,6 @@
 import type { PictureRecord } from "../../pictures/domain/ports";
 import type { SectionKey } from "./section";
+import type { StoredText, TextSectionKey } from "./texts";
 import type { SectionVideo } from "./video";
 
 /** Uma linha de atribuição: foto X na seção Y, na posição Z. */
@@ -19,6 +20,12 @@ export interface SectionRepository {
   /** Um vídeo por seção: grava por cima do anterior. */
   saveVideo(section: SectionKey, video: SectionVideo): Promise<void>;
   removeVideo(section: SectionKey): Promise<void>;
+  /** Os textos personalizados, como estão gravados (ainda não validados). */
+  listTexts(): Promise<StoredText[]>;
+  /** Um conteúdo por seção: grava por cima do anterior. */
+  saveText(section: TextSectionKey, content: unknown): Promise<void>;
+  /** Apagar a linha = a seção volta ao texto padrão. */
+  removeText(section: TextSectionKey): Promise<void>;
 }
 
 /** Confere no YouTube que o vídeo existe e é público; devolve o título. */

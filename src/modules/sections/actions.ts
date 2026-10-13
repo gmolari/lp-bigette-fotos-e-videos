@@ -10,10 +10,13 @@ import {
   clearSectionVideo,
   getBoard,
   reorderSection,
+  resetSectionText,
+  saveSectionText,
   setSectionVideo,
   unassignPicture,
 } from "./application/sections";
 import { assignPicturesSchema, reorderSectionSchema, unassignPictureSchema } from "./domain/section";
+import { resetTextSchema, saveTextSchema } from "./domain/texts";
 import { setVideoSchema } from "./domain/video";
 import { drizzleSectionRepository } from "./infrastructure/repository";
 import { youTubeLookup } from "./infrastructure/youtube";
@@ -77,6 +80,24 @@ export const removeSectionVideo = createAction(
   { name: "sections.video.remove", input: z.void() },
   async () => {
     const board = await clearSectionVideo(deps(), "video");
+    publish();
+    return board;
+  },
+);
+
+// ── Textos ────────────────────────────────────────────────────────
+// O padrão mora em content.ts; aqui só entra o personalizado (spec 008).
+
+export const saveSectionTexts = createAction({ name: "sections.texts.save", input: saveTextSchema }, async (data) => {
+  const board = await saveSectionText(deps(), data);
+  publish();
+  return board;
+});
+
+export const resetSectionTexts = createAction(
+  { name: "sections.texts.reset", input: resetTextSchema },
+  async ({ section }) => {
+    const board = await resetSectionText(deps(), section);
     publish();
     return board;
   },

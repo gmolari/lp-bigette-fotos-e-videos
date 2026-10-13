@@ -2,6 +2,9 @@
 
 **Status:** ✅ entregue em 26/09/2026 · depende da 001
 
+> 🔄 **A sessão descrita aqui (um JWT de 7 dias) foi substituída pela spec 009** — access de
+> 15 min + refresh com rotação. O portão, o bcrypt e o resto continuam valendo.
+
 ## Objetivo
 
 1. Estabelecer o padrão **cliente → back só por server action**, com zod + Drizzle + React Query.

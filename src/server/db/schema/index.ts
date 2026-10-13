@@ -4,5 +4,6 @@
  * `src/modules/<module>/infrastructure/schema.ts` e reexporta aqui.
  */
 export * from "../../../modules/users/infrastructure/schema";
+export * from "../../../modules/auth/infrastructure/schema";
 export * from "../../../modules/pictures/infrastructure/schema";
 export * from "../../../modules/sections/infrastructure/schema";
