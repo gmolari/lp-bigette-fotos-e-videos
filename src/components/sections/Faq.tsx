@@ -7,6 +7,7 @@ import { Gatilho } from "@/components/ui/Gatilho";
 import { Reveal } from "@/components/ui/Reveal";
 import { content } from "@/config/content";
 import { fillTokens } from "@/lib/tokens";
+import type { SectionTexts } from "@/modules/sections/domain/texts";
 
 /**
  * Sanfona acessível.
@@ -17,13 +18,15 @@ import { fillTokens } from "@/lib/tokens";
  *
  * A resposta continua sempre no HTML (só recortada), então buscador e
  * leitor de tela leem tudo mesmo com o item fechado. O FAQPage do
- * JSON-LD é gerado à parte, em src/lib/jsonld.ts.
+ * JSON-LD é gerado à parte, em src/lib/jsonld.ts, com os mesmos itens.
+ *
+ * As perguntas vêm do painel (/sections → Perguntas frequentes). A
+ * PRIMEIRA abre aberta: é "Quanto custa?", por decisão (D1) — e o painel
+ * não deixa tirá-la do topo.
  */
-export function Faq() {
+export function Faq({ textos }: { textos: SectionTexts["faq"] }) {
   const c = content.faq;
-  const [aberto, setAberto] = useState<number | null>(
-    c.itens.findIndex((i) => "aberto" in i && i.aberto),
-  );
+  const [aberto, setAberto] = useState<number | null>(0);
 
   return (
     <Section id="faq">
@@ -31,10 +34,10 @@ export function Faq() {
       <Title>{c.title}</Title>
 
       <div className="mt-12 border-t border-line">
-        {c.itens.map((item, i) => {
+        {textos.items.map((item, i) => {
           const estaAberto = aberto === i;
           return (
-            <Reveal key={item.q} variante="up" delay={i * 70}>
+            <Reveal key={i} variante="up" delay={i * 70}>
               <div className="border-b border-line">
                 <h3>
                   <button

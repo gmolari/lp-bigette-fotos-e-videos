@@ -5,7 +5,7 @@ import type { Db } from "@/server/db/client";
 // dimensões) numa ida só ao banco.
 import { pictures } from "../../pictures/infrastructure/schema";
 import type { SectionRepository } from "../domain/ports";
-import { sectionPictures, sectionVideos } from "./schema";
+import { sectionPictures, sectionTexts, sectionVideos } from "./schema";
 
 const pictureColumns = {
   id: pictures.id,
@@ -95,6 +95,21 @@ export function drizzleSectionRepository(db: Db): SectionRepository {
 
     async removeVideo(section) {
       await db.delete(sectionVideos).where(eq(sectionVideos.section, section));
+    },
+
+    listTexts() {
+      return db.select({ section: sectionTexts.section, content: sectionTexts.content }).from(sectionTexts);
+    },
+
+    async saveText(section, content) {
+      await db
+        .insert(sectionTexts)
+        .values({ section, content })
+        .onConflictDoUpdate({ target: sectionTexts.section, set: { content, updatedAt: new Date() } });
+    },
+
+    async removeText(section) {
+      await db.delete(sectionTexts).where(eq(sectionTexts.section, section));
     },
   };
 }

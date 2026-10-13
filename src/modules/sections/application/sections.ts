@@ -4,6 +4,7 @@ import { toPublic } from "../../pictures/application/pictures";
 import type { Picture } from "../../pictures/domain/picture";
 import type { SectionRepository, VideoLookup } from "../domain/ports";
 import { SECTION_KEYS, type SectionKey } from "../domain/section";
+import { resolveTexts, type ResolvedTexts, type SaveTextInput, type SectionTexts, type TextSectionKey } from "../domain/texts";
 import { parseYouTubeUrl, type SectionVideo, type VideoFormat } from "../domain/video";
 
 const v = panelContent.sections.validation;
@@ -20,7 +21,7 @@ export type BankPicture = Picture & { usedIn: SectionKey[] };
  * Tudo que as duas telas do painel precisam, numa action só — o Next
  * despacha actions em fila, então duas consultas seriam duas esperas.
  */
-export type Board = { sections: Sections; videos: Videos; bank: BankPicture[] };
+export type Board = { sections: Sections; videos: Videos; bank: BankPicture[]; texts: ResolvedTexts };
 
 /** Vídeo de cada seção que tem um (hoje só "video"). */
 export type Videos = Partial<Record<SectionKey, SectionVideo>>;
@@ -32,7 +33,8 @@ function emptySections(): Sections {
   return Object.fromEntries(SECTION_KEYS.map((k) => [k, []])) as unknown as Sections;
 }
 
-export async function getBoard(deps: SectionDeps): Promise<Board> {
+/** Fotos e vídeos, sem os textos — o que a landing page lê para as imagens. */
+async function loadMedia(deps: SectionDeps): Promise<Omit<Board, "texts">> {
   const [records, assignments, videoRows] = await Promise.all([
     deps.sections.listPictures(),
     deps.sections.listAssignments(),
@@ -57,9 +59,17 @@ export async function getBoard(deps: SectionDeps): Promise<Board> {
   return { sections, videos, bank };
 }
 
-/** Só o que a landing page mostra. */
+export async function getBoard(deps: SectionDeps): Promise<Board> {
+  const [media, textRows] = await Promise.all([loadMedia(deps), deps.sections.listTexts()]);
+  return { ...media, texts: resolveTexts(textRows) };
+}
+
+/**
+ * Só as fotos e o vídeo que a landing page mostra. NÃO lê os textos: são
+ * consultas separadas para que uma falhar não derrube a outra.
+ */
 export async function getPublished(deps: SectionDeps): Promise<Published> {
-  const { sections, videos } = await getBoard(deps);
+  const { sections, videos } = await loadMedia(deps);
   return { sections, videos };
 }
 
@@ -114,5 +124,26 @@ export async function setSectionVideo(
 
 export async function clearSectionVideo(deps: SectionDeps, section: SectionKey) {
   await deps.sections.removeVideo(section);
+  return getBoard(deps);
+}
+
+/**
+ * Os textos como a landing page os mostra: padrão + personalizado.
+ * Separado de `getPublished` de propósito — se esta leitura falhar, a
+ * página cai nos textos padrão sem perder as fotos junto.
+ */
+export async function getPublishedTexts(deps: SectionDeps): Promise<SectionTexts> {
+  return resolveTexts(await deps.sections.listTexts()).texts;
+}
+
+/** Grava o conteúdo inteiro da seção (já validado pelo esquema dela). */
+export async function saveSectionText(deps: SectionDeps, input: SaveTextInput) {
+  await deps.sections.saveText(input.section, input.content);
+  return getBoard(deps);
+}
+
+/** A seção volta ao texto padrão de `content.ts`. */
+export async function resetSectionText(deps: SectionDeps, section: TextSectionKey) {
+  await deps.sections.removeText(section);
   return getBoard(deps);
 }

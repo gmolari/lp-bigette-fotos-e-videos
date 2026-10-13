@@ -6,22 +6,33 @@ import { Reveal } from "@/components/ui/Reveal";
 import { VideoYouTube } from "@/components/ui/VideoYouTube";
 import { content } from "@/config/content";
 import type { FotoPortfolio, VideoDaPagina } from "@/lib/portfolio-tipos";
+import type { SectionTexts } from "@/modules/sections/domain/texts";
 
 /**
  * O vídeo vem do painel (/sections → Vídeo): link do YouTube + capa.
  *   com link        → fachada com play (VideoYouTube)
  *   só capa         → a foto, parada
  *   nada            → espaço reservado
+ *
+ * Título, texto de apoio e gatilho também vêm de lá (`textos`).
  */
-export function Video({ video, capa }: { video: VideoDaPagina | null; capa: FotoPortfolio | null }) {
+export function Video({
+  video,
+  capa,
+  textos,
+}: {
+  video: VideoDaPagina | null;
+  capa: FotoPortfolio | null;
+  textos: SectionTexts["video"];
+}) {
   const c = content.video;
   return (
     <Section id="video" alt>
       <div className="grid items-center gap-9 md:grid-cols-2 md:gap-14">
         <div>
           <Eyebrow>{c.eyebrow}</Eyebrow>
-          <Title>{c.title}</Title>
-          <Lead>{c.lead}</Lead>
+          <Title>{textos.title}</Title>
+          <Lead>{textos.lead}</Lead>
         </div>
         <Reveal variante="foco" delay={120}>
           {video ? (
@@ -35,7 +46,7 @@ export function Video({ video, capa }: { video: VideoDaPagina | null; capa: Foto
           )}
         </Reveal>
       </div>
-      <Gatilho {...c.gatilho} source="video" />
+      <Gatilho frase={textos.triggerPhrase} cta={textos.triggerCta} source="video" />
     </Section>
   );
 }

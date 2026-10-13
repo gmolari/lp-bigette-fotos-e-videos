@@ -1,5 +1,4 @@
 import { site } from "@/config/site";
-import { content } from "@/config/content";
 import { fillTokens } from "@/lib/tokens";
 import { telE164 } from "@/lib/whatsapp";
 
@@ -86,13 +85,19 @@ export function localBusinessSchema() {
   };
 }
 
-/** FAQPage — habilita o acordeão de perguntas direto no resultado de busca */
-export function faqSchema() {
+/**
+ * FAQPage — habilita o acordeão de perguntas direto no resultado de busca.
+ *
+ * Fora do `allSchemas()`: as perguntas vêm do painel (banco), e o layout
+ * raiz — que também embrulha o painel — não deve ir ao banco. Quem emite
+ * este é a própria página (`app/page.tsx`), com os itens que ela mostra.
+ */
+export function faqSchema(items: readonly { q: string; a: string }[]) {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     "@id": id("/#faq"),
-    mainEntity: content.faq.itens.map((item) => ({
+    mainEntity: items.map((item) => ({
       "@type": "Question",
       name: fillTokens(item.q),
       acceptedAnswer: { "@type": "Answer", text: fillTokens(item.a) },
@@ -146,7 +151,6 @@ export function allSchemas() {
       localBusinessSchema(),
       websiteSchema(),
       personSchema(),
-      faqSchema(),
       breadcrumbSchema(),
     ],
   };

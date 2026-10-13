@@ -15,6 +15,7 @@ export function FieldShell({
   hint,
   error,
   disabled,
+  multiline,
   className = "",
   children,
 }: {
@@ -24,6 +25,8 @@ export function FieldShell({
   hint?: string;
   error?: string;
   disabled?: boolean;
+  /** Textarea: o contorno deixa de ter altura fixa. */
+  multiline?: boolean;
   className?: string;
   children: React.ReactNode;
 }) {
@@ -44,6 +47,7 @@ export function FieldShell({
         className="field-control"
         data-invalid={error ? "true" : undefined}
         data-disabled={disabled ? "true" : undefined}
+        data-multiline={multiline ? "true" : undefined}
       >
         {children}
       </div>

@@ -9,6 +9,7 @@ import { content } from "@/config/content";
 import { site } from "@/config/site";
 import { damp, semMovimento } from "@/lib/motion";
 import type { FotoPortfolio } from "@/lib/portfolio-tipos";
+import type { SectionTexts } from "@/modules/sections/domain/texts";
 
 /**
  * O HERO
@@ -32,8 +33,10 @@ import type { FotoPortfolio } from "@/lib/portfolio-tipos";
  *
  * Tudo escreve em custom properties do DOM a partir de UM laço de rAF.
  * Passar isso por estado do React seria um render por quadro de scroll.
+ *
+ * `textos` vem do painel (/sections); o texto do botão segue em content.ts.
  */
-export function Hero({ foto }: { foto: FotoPortfolio }) {
+export function Hero({ foto, textos }: { foto: FotoPortfolio; textos: SectionTexts["hero"] }) {
   const raizRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -136,19 +139,19 @@ export function Hero({ foto }: { foto: FotoPortfolio }) {
         <Reveal variante="left" imediato>
           <p className="mb-5 flex items-center gap-3 text-[11px] font-semibold tracking-[0.24em] text-ouro uppercase">
             <span aria-hidden="true" className="h-px w-9 bg-ouro/70" />
-            {content.hero.eyebrow} — {site.city}
+            {textos.eyebrow} — {site.city}
           </p>
         </Reveal>
 
         <Reveal variante="cortina" delay={90} imediato>
           <h1 className="max-w-[15ch] font-display text-[clamp(42px,8vw,76px)] leading-[1.02] tracking-[-0.02em] [text-shadow:0_2px_28px_rgba(10,9,17,.55)]">
-            {content.hero.title}
+            {textos.title}
           </h1>
         </Reveal>
 
         <Reveal variante="up" delay={230} imediato>
           <p className="my-7 max-w-[54ch] text-[clamp(17px,2.1vw,21px)] leading-relaxed text-cream/80 [text-shadow:0_1px_16px_rgba(10,9,17,.6)]">
-            {content.hero.lead}
+            {textos.lead}
           </p>
         </Reveal>
 
@@ -166,7 +169,7 @@ export function Hero({ foto }: { foto: FotoPortfolio }) {
               aria-hidden="true"
               className="shrink-0 text-accent"
             />
-            {content.hero.selo}
+            {textos.seal}
           </p>
         </Reveal>
       </div>

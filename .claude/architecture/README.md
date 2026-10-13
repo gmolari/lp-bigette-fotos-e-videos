@@ -32,7 +32,9 @@ src/
 │   ├── action.ts             createAction() — a fábrica de toda server action
 │   ├── errors.ts             classifyError() — exceção → código + mensagem segura
 │   ├── log.ts                logError() — JSON em produção, legível em dev
-│   ├── auth/jwt.ts           sign/verify do JWT { sub, ver } (jose). Sem server-only: o proxy usa
+│   ├── auth/jwt.ts           access token: JWT { sub, ver, sid } de 15 min (jose). Sem server-only: o proxy usa
+│   ├── auth/refresh-token.ts refresh opaco de 7 dias: gerar, hashear, ler. Sem server-only
+│   ├── auth/cookies.ts       os dois cookies da sessão, gravados igual por action e proxy
 │   ├── auth/password.ts      bcrypt (custo 12)
 │   ├── panel/gate.ts         portão do link especial (HMAC). Sem server-only: o proxy usa
 │   └── db/                   client.ts · schema/index.ts · migrations/
@@ -48,8 +50,8 @@ src/
 | Módulo | Contém |
 |---|---|
 | `users` | tabela `users` + enum `user_role`, repositório, perfil (dados/senha), admin (CRUD + regras do último admin) |
-| `auth` | login (e-mail ou username), `guards.ts` (`getCurrentUser`, `requireUser`, `requireAdmin`, `requireGate`, sessão) |
-| `sections` | tabela `section_pictures` + enum `page_section`: qual foto em qual seção e em que ordem. `section_videos`: link do YouTube por seção, validado no oEmbed (spec 007). Fachada `getPublishedSections()` com cache por tag, lida pela LP. Lê `pictures` direto no repositório (exceção consciente). Spec 006 |
+| `auth` | login (e-mail ou username), `guards.ts` (`getCurrentUser`, `requireUser`, `requireAdmin`, `requireGate`, sessão). Tabela `auth_sessions`: uma linha por sessão, refresh token rotativo de uso único (`application/sessions.ts`); `refresh.ts` é o que o proxy chama. Spec 009 |
+| `sections` | tabela `section_pictures` + enum `page_section`: qual foto em qual seção e em que ordem. `section_videos`: link do YouTube por seção, validado no oEmbed (spec 007). Fachada `getPublishedSections()` com cache por tag, lida pela LP. Lê `pictures` direto no repositório (exceção consciente). Spec 006. `section_texts`: texto personalizado por seção em JSON, validado por zod na escrita e na leitura; padrão em `content.ts` (`domain/texts.ts` o importa — é config, sem driver). Fachada `getPublishedSectionTexts()`. Spec 008 |
 | `pictures` | o BANCO de fotos: tabela `pictures`, upload no Vercel Blob (`infrastructure/blob.ts`), inspeção com sharp, ordem. `readPictureFile()` para a rota `/media`. Spec 005 |
 
 `auth` depende de `users` (lê o repositório). `server/action.ts` importa os guards
@@ -59,7 +61,7 @@ de `modules/auth/guards.ts` — exceção consciente à direção das camadas.
 
 | Camada | Pode importar | Não pode |
 |---|---|---|
-| `domain` | zod, `panel-content` (mensagens) | drizzle, next, react, `@/server/*` |
+| `domain` | zod, `panel-content` (mensagens), `content` (texto padrão) | drizzle, next, react, `@/server/*` |
 | `application` | `domain` | `infrastructure`, `@/server/db` |
 | `infrastructure` | `domain`, `@/server/db`, drizzle, bcrypt | `application`, `src/app` |
 | `actions.ts` | tudo do módulo + `@/server/*` | — |
@@ -93,7 +95,7 @@ componente  ◄──ActionError (code, fields) ou data────────�
 - **`guard`: `"user"` (padrão) · `"admin"` · `"gate"` · `"public"`.** Action é endpoint
   POST; o proxy não a protege. Só login/logout usam `"gate"`.
 - **Sessão conferida no banco** a cada requisição (usuário existe, `session_version`
-  bate, papel atual). O proxy só confere a assinatura do JWT — por isso **o proxy
+  bate, papel atual, sessão não revogada). O proxy só confere a assinatura do JWT — por isso **o proxy
   nunca redireciona para dentro**, só para fora (ver spec 003, loop de redirecionamento).
 - `FieldError` (lib/action/result) → erro que aparece embaixo de um campo específico
   (ex.: e-mail já em uso, detectado pela constraint UNIQUE — nunca por checagem prévia).

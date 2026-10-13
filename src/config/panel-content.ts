@@ -146,7 +146,7 @@ export const panelContent = {
   sections: {
     metaTitle: "Seções",
     title: "Seções",
-    lead: "Escolha quais fotos do banco aparecem em cada parte da página, e em que ordem.",
+    lead: "A página inteira, na ordem: quais fotos do banco aparecem em cada parte, e os textos que dá para alterar.",
     emptyBankTitle: "O banco de fotos está vazio",
     emptyBankText: "Envie as fotos em Fotos e volte aqui para atrelá-las às seções.",
     goToPictures: "Ir para Fotos",
@@ -262,6 +262,97 @@ export const panelContent = {
         urlInvalid: "Não parece um link de vídeo do YouTube.",
         notFound: "O YouTube não encontrou este vídeo público. Confira se ele não é privado e se permite incorporação.",
         format: "Escolha o formato.",
+      },
+    },
+
+    /**
+     * Textos da página (spec 008). O padrão mora em `content.ts`; o painel
+     * grava só o que for personalizado, seção por seção.
+     */
+    texts: {
+      title: "Textos",
+      open: "Editar textos",
+      close: "Fechar",
+      isDefault: "Texto padrão",
+      isCustom: "Personalizado",
+      save: "Salvar textos",
+      saving: "Salvando…",
+      saved: "Textos salvos. Já estão no site.",
+      reset: "Voltar ao texto padrão",
+      confirmReset: "Confirmar: apagar o personalizado",
+      resetting: "Voltando…",
+      resetDone: "Voltou ao texto padrão.",
+      remove: "Remover",
+      onlyTextsNote: "O banco de fotos está vazio, mas os textos já podem ser editados.",
+
+      /** As seções que só têm texto (as outras usam o nome de `items`, acima). */
+      items: {
+        band: {
+          name: "Faixa de impacto",
+          where: "A faixa lilás logo abaixo do banner, com duas frases.",
+        },
+        experience: {
+          name: "Experiência",
+          where: "Os três cartões numerados de “O que acontece no dia”.",
+        },
+        testimonials: {
+          name: "Depoimentos",
+          where: "As frases curtas de reação das clientes.",
+        },
+        faq: {
+          name: "Perguntas frequentes",
+          where: "A sanfona de perguntas e respostas — também vai para o Google como dado estruturado.",
+        },
+      },
+
+      fields: {
+        hero: {
+          eyebrow: "Chamada acima do título",
+          eyebrowHint: "A cidade entra sozinha no fim (“… — Londrina”).",
+          title: "Título",
+          lead: "Texto de apoio",
+          seal: "Selo abaixo do botão",
+        },
+        band: { first: "Primeira frase", second: "Segunda frase" },
+        experience: {
+          card: (n: number) => `Cartão ${String(n).padStart(2, "0")}`,
+          title: "Título",
+          text: "Texto",
+        },
+        testimonials: {
+          item: (n: number) => `Frase ${n}`,
+          quote: "Frase",
+          context: "Contexto",
+          contextHint: "Ex.: Ensaio gestante. Sem nome e sem foto.",
+          add: "Adicionar frase",
+          note: "Só frases que clientes disseram de verdade, com autorização.",
+        },
+        video: {
+          title: "Título",
+          lead: "Texto de apoio",
+          triggerPhrase: "Frase de efeito no fim da seção",
+          triggerCta: "Texto do botão",
+        },
+        about: {
+          title: "Título",
+          item: (n: number) => `Parágrafo ${n}`,
+          add: "Adicionar parágrafo",
+        },
+        faq: {
+          item: (n: number) => `Pergunta ${n}`,
+          q: "Pergunta",
+          a: "Resposta",
+          add: "Adicionar pergunta",
+          note: "Marcadores preenchidos sozinhos: {CIDADE}, {PRAZO} (dias de entrega) e {RAIO} (km de atendimento).",
+          pinned: "A primeira pergunta fica sempre no topo e abre já aberta na página.",
+        },
+      },
+
+      validation: {
+        required: "Preencha este campo.",
+        tooLong: (max: number) => `Máximo de ${max} caracteres.`,
+        listMin: (min: number) => (min === 1 ? "Precisa de pelo menos 1 item." : `Precisa de pelo menos ${min} itens.`),
+        listMax: (max: number) => `Máximo de ${max} itens.`,
       },
     },
 

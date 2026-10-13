@@ -135,7 +135,8 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${display.variable} ${displayItalico.variable} ${corpo.variable}`}>
       <head>
-        {/* Dados estruturados — LocalBusiness, FAQ, Person, WebSite */}
+        {/* Dados estruturados — LocalBusiness, Person, WebSite.
+            O FAQPage sai em app/page.tsx, com as perguntas do painel. */}
         <script
           type="application/ld+json"
           // O conteúdo é gerado por nós, não vem de input do usuário.

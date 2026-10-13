@@ -1,5 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { refreshSession } from "@/modules/auth/refresh";
+import { clearSessionCookies, writeAccessCookie, writeRefreshCookie } from "@/server/auth/cookies";
 import { SESSION_COOKIE, verifySession } from "@/server/auth/jwt";
+import { REFRESH_COOKIE } from "@/server/auth/refresh-token";
 import {
   accessKeyMatches,
   ACCESS_PARAM,
@@ -16,8 +19,11 @@ import {
  * 1. PORTÃO — sem o cookie do link especial, as rotas do painel NÃO
  *    EXISTEM: respondem o 404 padrão, idêntico ao de uma URL inventada.
  *    Nada de 401/403 — isso confirmaria que há algo ali.
- * 2. SESSÃO — com o portão aberto, as páginas internas exigem o JWT;
- *    sem ele, vão para /login.
+ * 2. SESSÃO — com o portão aberto, as páginas internas exigem o access
+ *    token (JWT de 15 min). Vencido ou ausente, o proxy tenta RENOVAR
+ *    com o refresh token: troca por um par novo, grava os cookies na
+ *    resposta e entrega o access novo à própria requisição em curso.
+ *    Sem renovação possível, vão para /login. Spec 009.
  *
  * ⚠️ O proxy NÃO manda quem tem JWT de /login para dentro. O JWT pode
  * ter assinatura válida e estar morto (senha trocada → session_version
@@ -60,12 +66,37 @@ export async function proxy(req: NextRequest) {
     return notFound(req);
   }
 
-  const session = await verifySession(req.cookies.get(SESSION_COOKIE)?.value);
-  const isLogin = req.nextUrl.pathname === LOGIN;
+  if (await verifySession(req.cookies.get(SESSION_COOKIE)?.value)) {
+    return noIndex(NextResponse.next());
+  }
 
-  if (!session && !isLogin) return noIndex(redirectTo(req, LOGIN));
+  const hadRefresh = req.cookies.has(REFRESH_COOKIE);
+  const refreshed = await refreshSession(req.cookies.get(REFRESH_COOKIE)?.value);
 
-  return noIndex(NextResponse.next());
+  if (refreshed.kind === "ok") {
+    // A página e a action desta MESMA requisição leem `cookies()`: o
+    // cabeçalho da requisição precisa levar o access novo, não só a resposta.
+    req.cookies.set(SESSION_COOKIE, refreshed.accessToken);
+    if (refreshed.refresh) req.cookies.set(REFRESH_COOKIE, refreshed.refresh.token);
+
+    const res = NextResponse.next({ request: { headers: req.headers } });
+    writeAccessCookie(res.cookies, refreshed.accessToken);
+    if (refreshed.refresh) writeRefreshCookie(res.cookies, refreshed.refresh.token, refreshed.refresh.expiresAt);
+    return noIndex(res);
+  }
+
+  // Sem sessão. Dois casos NÃO são redirecionados:
+  //  - /login, que é onde a pessoa precisa chegar;
+  //  - server action (POST com `next-action`): um redirect ali vira erro
+  //    de transporte no cliente. A action passa, o guard dela responde
+  //    UNAUTHENTICATED e o painel leva ao login (Providers.tsx).
+  const passThrough = req.nextUrl.pathname === LOGIN || req.headers.has("next-action");
+  const res = passThrough ? NextResponse.next() : redirectTo(req, LOGIN);
+
+  // Refresh recusado (vencido, revogado, reusado): os cookies não servem
+  // mais. Banco fora do ar ("error") não apaga nada — a sessão pode estar boa.
+  if (hadRefresh && refreshed.kind === "rejected") clearSessionCookies(res.cookies);
+  return noIndex(res);
 }
 
 function redirectTo(req: NextRequest, pathname: string) {
